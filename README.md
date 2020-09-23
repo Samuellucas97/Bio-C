@@ -1,2 +1,3 @@
-# Sem-Nome
-Projeto de intepretador da linguagem Sem-Nome
+## Sobre
+
+Neste repositório contém o projeto de intepretador da linguagem Sem-Nome.
