@@ -1,0 +1,11 @@
+-- Programa de fatorial 
+int main(void) {
+  int n = 3;
+  int result = 1;
+
+  while( n > 1) {
+    result = result * n;
+    n = n-1;
+  }
+  return 0;
+}
