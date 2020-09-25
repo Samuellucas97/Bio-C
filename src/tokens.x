@@ -1,11 +1,5 @@
 {
-  module Main (
-                main, 
-                Token(..), 
-                AlexPosn(..), 
-                alexScanTokens, 
-                token_posn
-              ) where
+  module Main (main, Token(..), AlexPosn(..), alexScanTokens, token_posn) where
 }
 
 %wrapper "posn"
@@ -41,18 +35,18 @@ tokens :-
   "*"                             { \p s -> Mult (getLC p) }
   "/"                             { \p s -> Div (getLC p) }
   
-  while                           { \p s -> While (getLC p) }
-  if                              { \p s -> If (getLC p) }
-  else                            { \p s -> Else (getLC p) }
-  or                              { \p s -> OpOr (getLC p) }
-  xor                             { \p s -> OpXor (getLC p) }
-  and                             { \p s -> OpAnd (getLC p) }
-  $digit+	                        { \p s -> Int p (read s) }
-  $digit+\.$digit+                { \p s -> Float (read s)  (getLC p) }
-  \'.\'                           { \p s -> Char (read s)  (getLC p) }
-  "True"                          { \p s -> Boolean (read s) (getLC p) }
-  "False"                         { \p s -> Boolean (read s) (getLC p) }
-  $alpha [$alpha $digit \_ \']*	  { \p s -> Var s  (getLC p)}
+--  while                           { \p s -> While (getLC p) }
+--  if                              { \p s -> If (getLC p) }
+--  else                            { \p s -> Else (getLC p) }
+--  or                              { \p s -> OpOr (getLC p) }
+--  xor                             { \p s -> OpXor (getLC p) }
+--  and                             { \p s -> OpAnd (getLC p) }
+--  $digit+	                        { \p s -> Int p (read s) }
+--  $digit+\.$digit+                { \p s -> Float (read s)  (getLC p) }
+--  \'.\'                           { \p s -> Char (read s)  (getLC p) }
+--  "True"                          { \p s -> Boolean (read s) (getLC p) }
+--  "False"                         { \p s -> Boolean (read s) (getLC p) }
+--  $alpha [$alpha $digit \_ \']*	  { \p s -> Var s  (getLC p)}
 
 {
 -- Each right-hand side has type :: String -> AlexPosn -> Token
@@ -82,7 +76,7 @@ data Token =
   LessOrEqual (Int, Int)      | 
   Plus (Int, Int)             |  
   Mult (Int, Int)             |
-  Div (Int, Int)              | 
+  Div (Int, Int)               
 
 
 getLC (AlexPn _ l c) = (l, c)  
