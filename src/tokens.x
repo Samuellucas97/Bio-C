@@ -8,7 +8,6 @@ $digit = 0-9       -- digits
 $alpha = [a-zA-Z]  -- alphabetic characters
 
 tokens :-
-
   $white+                         ;
   "//".*.                         ;
   "return"                        { \p s -> Return (getLC p) }
@@ -34,22 +33,22 @@ tokens :-
   "+"                             { \p s -> Plus (getLC p) }
   "*"                             { \p s -> Mult (getLC p) }
   "/"                             { \p s -> Div (getLC p) }
-  
---  while                           { \p s -> While (getLC p) }
---  if                              { \p s -> If (getLC p) }
---  else                            { \p s -> Else (getLC p) }
---  or                              { \p s -> OpOr (getLC p) }
---  not                             { \p s -> OpXor (getLC p) }
---  and                             { \p s -> OpAnd (getLC p) }
---  $digit+	                        { \p s -> Int p (read s) }
---  $digit+\.$digit+                { \p s -> Float (read s)  (getLC p) }
---  \'.\'                           { \p s -> Char (read s)  (getLC p) }
---  "True"                          { \p s -> Boolean (read s) (getLC p) }
---  "False"                         { \p s -> Boolean (read s) (getLC p) }
---  $alpha [$alpha $digit \_ \']*	  { \p s -> Var s  (getLC p)}
+    
+  while                           { \p s -> While (getLC p) }
+  if                              { \p s -> If (getLC p) }
+  else                            { \p s -> Else (getLC p) }
+  or                              { \p s -> OpOr (getLC p) }
+  not                             { \p s -> OpNot (getLC p) }
+  and                             { \p s -> OpAnd (getLC p) }
+  $digit+	                        { \p s -> Int (read s) (getLC p) }
+  $digit+\.$digit+                { \p s -> Float (read s)  (getLC p) }
+  \'.\'                           { \p s -> Char (read s)  (getLC p) }
+  "True"                          { \p s -> Boolean (read s)  (getLC p }
+  "False"                         { \p s -> Boolean (read s)  (getLC p }
+  $alpha [$alpha $digit \_ \']*	  { \p s -> Var (read s)  (getLC p) }
 
 {
--- Each right-hand side has type :: String -> AlexPosn -> Token
+-- Each right-hand side has type :: AlexPosn -> String -> Token
 -- Some action helpers:
 
 -- The token type:
@@ -66,7 +65,6 @@ data Token =
   Float Float     (Int, Int) |
   Char Char       (Int, Int) |
   Boolean Bool    (Int, Int) |
-
   Equal (Int, Int)            |
   Assign (Int, Int)           |
   Different (Int, Int)        | 
@@ -76,13 +74,23 @@ data Token =
   LessOrEqual (Int, Int)      | 
   Plus (Int, Int)             |  
   Mult (Int, Int)             |
-  Div (Int, Int)               
-
+  Div (Int, Int)              |
+  While (Int, Int) |
+  If (Int, Int) |
+  Else (Int, Int) |
+  OpOr (Int, Int) |
+  OpNot (Int, Int) |
+  OpAnd (Int, Int) |
+  Int Int (Int, Int) |
+  Float Float (Int, Int) |
+  Char Char (Int, Int) |
+  Boolean Bool (Int, Int) |
+  Var String (Int, Int) 
+  deriving (Eq,Show)
 
 getLC (AlexPn _ l c) = (l, c)  
 
-
-main = do
+main = do{
   s <- getContents
-  print (alexScanTokens s)
+  print (alexScanTokens s)}
 }
