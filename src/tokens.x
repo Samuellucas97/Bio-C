@@ -55,46 +55,38 @@ tokens :-
   $alpha [$alpha $digit \_ \']*	  { \p s -> Var s  (getLC p)}
 
 {
--- Each right-hand side has type :: AlexPosn -> String -> Token
+-- Each right-hand side has type :: String -> AlexPosn -> Token
 -- Some action helpers:
 
 -- The token type:
 data Token =
-  Return AlexPosn           |
-  BeginScope AlexPosn       |
-  EndScope AlexPosn         |
-  BeginBracket AlexPosn     |
-  EndBracket AlexPosn       |
-  SemiColon AlexPosn        |
-  Comma AlexPosn            |
-  
--- Type String     (Int, Int) |
---  Int  Int        (Int, Int) |
---  Float Float     (Int, Int) |
---  Char Char       (Int, Int) |
---  Boolean Bool    (Int, Int) |
+  Return          (Int, Int) |
+  BeginScope      (Int, Int) |
+  EndScope        (Int, Int) |
+  BeginBracket    (Int, Int) |
+  EndBracket      (Int, Int) |
+  SemiColon       (Int, Int) |
+  Comma           (Int, Int) |
+  Type String     (Int, Int) |
+  Int  Int        (Int, Int) |
+  Float Float     (Int, Int) |
+  Char Char       (Int, Int) |
+  Boolean Bool    (Int, Int) |
 
-  Equal AlexPosn            |
-  Assign AlexPosn           |
-  Different AlexPosn        | 
-  Greater AlexPosn          |
-  Less AlexPosn             | 
-  GreaterOrEqual AlexPosn   |     
-  LessOrEqual AlexPosn      | 
-  Plus AlexPosn             |  
-  Mult AlexPosn             |
-  Div AlexPosn              | 
-
+  Equal (Int, Int)            |
+  Assign (Int, Int)           |
+  Different (Int, Int)        | 
+  Greater (Int, Int)          |
+  Less (Int, Int)             | 
+  GreaterOrEqual (Int, Int)   |     
+  LessOrEqual (Int, Int)      | 
+  Plus (Int, Int)             |  
+  Mult (Int, Int)             |
+  Div (Int, Int)              | 
 
 
 getLC (AlexPn _ l c) = (l, c)  
 
-
-token_posn (Let p) = p
-token_posn (In p) = p
-token_posn (Sym p _) = p
-token_posn (Var p _) = p
-token_posn (Int p _) = p
 
 main = do
   s <- getContents
