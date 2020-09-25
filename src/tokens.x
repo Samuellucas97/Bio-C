@@ -39,7 +39,7 @@ tokens :-
 --  if                              { \p s -> If (getLC p) }
 --  else                            { \p s -> Else (getLC p) }
 --  or                              { \p s -> OpOr (getLC p) }
---  xor                             { \p s -> OpXor (getLC p) }
+--  not                             { \p s -> OpXor (getLC p) }
 --  and                             { \p s -> OpAnd (getLC p) }
 --  $digit+	                        { \p s -> Int p (read s) }
 --  $digit+\.$digit+                { \p s -> Float (read s)  (getLC p) }
