@@ -1,5 +1,5 @@
 -- Programa de fatorial 
-int main(void) {
+int main() {
   int n = 3;
   int result = 1;
 

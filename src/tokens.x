@@ -1,5 +1,11 @@
 {
-  module Main (main, Token(..), AlexPosn(..), alexScanTokens, token_posn) where
+  module Main (
+                main, 
+                Token(..), 
+                AlexPosn(..), 
+                alexScanTokens, 
+                token_posn
+              ) where
 }
 
 %wrapper "posn"
@@ -11,40 +17,38 @@ tokens :-
 
   $white+                         ;
   "//".*.                         ;
-  "return"                        { \p s -> Return (getLC p) }
-  "{"                             { \p s -> BeginScope (getLC p) }
-  "}"                             { \p s -> EndScope (getLC p) }
-  "("                             { \p s -> BeginBracket (getLC p) }
-  ")"                             { \p s -> EndBracket (getLC p) }
-  ";"                             { \p s -> SemiColon (getLC p) }
-  ","                             { \p s -> Comma  (getLC p) }
-  let                             { \p s -> Let p }
-  in                              { \p s -> In p }
-  int                             { \p s -> Type s (getLC p) }
-  float                           { \p s -> Type s (getLC p) }
-  char                            { \p s -> Type s (getLC p) }
-  boolean                         { \p s -> Type s (getLC p) }
-  "=="                            { \p s -> Equal (getLC p) }
-  "="                             { \p s -> Assign (getLC p) }
-  "!="                            { \p s -> Different (getLC p) }
-  ">"                             { \p s -> Greater (getLC p) }
-  "<"                             { \p s -> Less (getLC p) }
-  ">="                            { \p s -> GreaterOrEqual (getLC p) }
-  "<="                            { \p s -> LessOrEqual (getLC p) }
-  "+"                             { \p s -> Plus (getLC p) }
-  "*"                             { \p s -> Mult (getLC p) }
-  "/"                             { \p s -> Div (getLC p) }
-  while                           { \p s -> While (getLC p) }
-  if                              { \p s -> If (getLC p) }
-  else                            { \p s -> Else (getLC p) }
-  or                              { \p s -> OpOr (getLC p) }
-  xor                             { \p s -> OpXor (getLC p) }
-  and                             { \p s -> OpAnd (getLC p) }
+  "return"                        { \p s -> Return p }
+  "{"                             { \p s -> BeginScope p }
+  "}"                             { \p s -> EndScope p }
+  "("                             { \p s -> BeginBracket p }
+  ")"                             { \p s -> EndBracket p }
+  ";"                             { \p s -> SemiColon p }
+  ","                             { \p s -> Comma  p }
+  int                             { \p s -> Type s p }
+  float                           { \p s -> Type s p }
+  char                            { \p s -> Type s p }
+  boolean                         { \p s -> Type s p }
+  "=="                            { \p s -> Equal p }
+  "="                             { \p s -> Assign p }
+  "!="                            { \p s -> Different p }
+  ">"                             { \p s -> Greater p }
+  "<"                             { \p s -> Less p }
+  ">="                            { \p s -> GreaterOrEqual p }
+  "<="                            { \p s -> LessOrEqual p }
+  "+"                             { \p s -> Plus p }
+  "*"                             { \p s -> Mult p }
+  "/"                             { \p s -> Div p }
+  while                           { \p s -> While p }
+  if                              { \p s -> If p }
+  else                            { \p s -> Else p }
+  or                              { \p s -> OpOr p }
+  xor                             { \p s -> OpXor p }
+  and                             { \p s -> OpAnd p }
   $digit+	                        { \p s -> Int p (read s) }
-  $digit+\.$digit+                { \p s -> Float (read s)  (getLC p) }
-  \'.\'                           { \p s -> Char (read s)  (getLC p) }
-  "True"                          { \p s -> Boolean (read s) (getLC p) }
-  "False"                         { \p s -> Boolean (read s) (getLC p) }
+  $digit+\.$digit+                { \p s -> Float (read s)  p }
+  \'.\'                           { \p s -> Char (read s)  p }
+  "True"                          { \p s -> Boolean (read s) p }
+  "False"                         { \p s -> Boolean (read s) p }
   [\=\+\-\*\/\(\)]			          { \p s -> Sym p (head s) }
   $alpha [$alpha $digit \_ \']*	  { \p s -> Var p s }
 
@@ -54,7 +58,8 @@ tokens :-
 
 -- The token type:
 data Token =
-  Let AlexPosn        |
+
+  Return AlexPosn        |
   In  AlexPosn        |
   Sym AlexPosn Char   |
   Var AlexPosn String |
