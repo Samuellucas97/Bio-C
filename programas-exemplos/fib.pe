@@ -7,5 +7,10 @@ int fib(int n) {
 
 int main(){
 	int r = fib(3);
+    dna d = "CATGAAAC.GTT";
+    dna d2 = "CAGAAAC.G"
+    rna rn = "CAUGA.AACGUU";
+    protein p = "DABCDEFGHIKLMNQABCDEFGHTVWXYZRSKLMNPQRSTVWXABNPQRSTVWXYZYAKLMNPQR";
+    string s = "A";
   return 0;
 }
