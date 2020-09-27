@@ -9,9 +9,9 @@ $alpha = [a-zA-Z]  -- alphabetic characters
 $dna = [ACGTRYSWKMBDHVN\.]
 $rna = [ACGURYSWKMBDHVN\.]
 $protein = [ABCDEFGHIKLMNPQRSTVWXYZ]
-@dna = \" ($dna)* \"
-@rna = \" ($rna)* \"
-@protein = \" ($protein)* \"
+--@dna = \" ($dna)* \"
+--@rna = \" ($rna)* \"
+--@protein = \" ($protein)* \"
 -- http://bioinformatics.org/sms2/iupac.html  
 
 tokens :-
@@ -58,9 +58,9 @@ tokens :-
   \'.\'                           { \p s -> Char p ( read s ) }
   "True"                          { \p s -> Boolean p (read s) }
   "False"                         { \p s -> Boolean p (read s) }
-  @dna                            { \p s -> Dna p (read s) }
-  @rna                            { \p s -> Rna p (read s) }
-  @protein                        { \p s -> Protein p (read s) }
+--  @dna                            { \p s -> Dna p (read s) }
+--  @rna                            { \p s -> Rna p (read s) }
+--  @protein                        { \p s -> Protein p (read s) }
   \".*.\"                         { \p s -> String p (read s) }
   $alpha [$alpha $digit \_ \']*	  { \p s -> Var p s }
 
