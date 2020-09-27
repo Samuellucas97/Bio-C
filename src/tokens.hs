@@ -2,7 +2,7 @@
 {-# LANGUAGE CPP #-}
 {-# LINE 1 "tokens.x" #-}
 
-  module Main (main, Token(..), AlexPosn(..), alexScanTokens, token_posn) where
+module Main (main, Token(..), AlexPosn(..), alexScanTokens) where
 
 #if __GLASGOW_HASKELL__ >= 603
 #include "ghcconfig.h"
@@ -13860,87 +13860,81 @@ alex_actions = array (0 :: Int, 72)
   , (0,alex_action_34)
   ]
 
-{-# LINE 50 "tokens.x" #-}
+{-# LINE 48 "tokens.x" #-}
 
 -- Each right-hand side has type :: AlexPosn -> String -> Token
 -- Some action helpers:
 
 -- The token type:
 data Token =
-  Return          (Int, Int) |
-  BeginScope      (Int, Int) |
-  EndScope        (Int, Int) |
-  BeginBracket    (Int, Int) |
-  EndBracket      (Int, Int) |
-  SemiColon       (Int, Int) |
-  Comma           (Int, Int) |
-  Type String     (Int, Int) |
-  Int  Int        (Int, Int) |
-  Float Float     (Int, Int) |
-  Char Char       (Int, Int) |
-  Boolean Bool    (Int, Int) |
-  Equal (Int, Int)            |
-  Assign (Int, Int)           |
-  Different (Int, Int)        | 
-  Greater (Int, Int)          |
-  Less (Int, Int)             | 
-  GreaterOrEqual (Int, Int)   |     
-  LessOrEqual (Int, Int)      | 
-  Plus (Int, Int)             |  
-  Mult (Int, Int)             |
-  Div (Int, Int)              |
-  While (Int, Int) |
-  If (Int, Int) |
-  Else (Int, Int) |
-  OpOr (Int, Int) |
-  OpNot (Int, Int) |
-  OpAnd (Int, Int) |
-  Int Int (Int, Int) |
-  Float Float (Int, Int) |
-  Char Char (Int, Int) |
-  Boolean Bool (Int, Int) |
-  Var String (Int, Int) 
---  deriving (Eq,Show)
+  Return          AlexPosn |
+  BeginScope      AlexPosn |
+  EndScope        AlexPosn |
+  BeginBracket    AlexPosn |
+  EndBracket      AlexPosn |
+  SemiColon       AlexPosn |
+  Comma           AlexPosn |
+  Type     AlexPosn String |
+  Equal           AlexPosn |
+  Assign          AlexPosn |
+  Different       AlexPosn |
+  Greater         AlexPosn |
+  Less            AlexPosn | 
+  GreaterOrEqual  AlexPosn |     
+  LessOrEqual     AlexPosn | 
+  Plus            AlexPosn |  
+  Mult            AlexPosn |
+  Div             AlexPosn |
+  While           AlexPosn |
+  If              AlexPosn |
+  Else            AlexPosn |
+  OpOr            AlexPosn |
+  OpNot           AlexPosn |
+  OpAnd           AlexPosn |
+  Int         AlexPosn Int |
+  Float     AlexPosn Float |
+  Char       AlexPosn Char |
+  Boolean AlexPosn Bool    |
+  Var AlexPosn String 
+  deriving (Eq,Show)
 
-getLC (AlexPn _ l c) = (l, c)  
-
-main = do{
+main = do
   s <- getContents
-  print (alexScanTokens s)}
+  print (alexScanTokens s)
 
-alex_action_2 =  \p s -> Return (getLC p) 
-alex_action_3 =  \p s -> BeginScope (getLC p) 
-alex_action_4 =  \p s -> EndScope (getLC p) 
-alex_action_5 =  \p s -> BeginBracket (getLC p) 
-alex_action_6 =  \p s -> EndBracket (getLC p) 
-alex_action_7 =  \p s -> SemiColon (getLC p) 
-alex_action_8 =  \p s -> Comma (getLC p) 
-alex_action_9 =  \p s -> Type s (getLC p) 
-alex_action_10 =  \p s -> Type s (getLC p) 
-alex_action_11 =  \p s -> Type s (getLC p) 
-alex_action_12 =  \p s -> Type s (getLC p) 
-alex_action_13 =  \p s -> Equal (getLC p) 
-alex_action_14 =  \p s -> Assign (getLC p) 
-alex_action_15 =  \p s -> Different (getLC p) 
-alex_action_16 =  \p s -> Greater (getLC p) 
-alex_action_17 =  \p s -> Less (getLC p) 
-alex_action_18 =  \p s -> GreaterOrEqual (getLC p) 
-alex_action_19 =  \p s -> LessOrEqual (getLC p) 
-alex_action_20 =  \p s -> Plus (getLC p) 
-alex_action_21 =  \p s -> Mult (getLC p) 
-alex_action_22 =  \p s -> Div (getLC p) 
-alex_action_23 =  \p s -> While (getLC p) 
-alex_action_24 =  \p s -> If (getLC p) 
-alex_action_25 =  \p s -> Else (getLC p) 
-alex_action_26 =  \p s -> OpOr (getLC p) 
-alex_action_27 =  \p s -> OpNot (getLC p) 
-alex_action_28 =  \p s -> OpAnd (getLC p) 
-alex_action_29 =  \p s -> Int (read s) (getLC p) 
-alex_action_30 =  \p s -> Float (read s)  (getLC p) 
-alex_action_31 =  \p s -> Char (read s)  (getLC p) 
-alex_action_32 =  \p s -> Boolean (read s)  (getLC p 
-alex_action_33 =  \p s -> Boolean (read s)  (getLC p 
-alex_action_34 =  \p s -> Var (read s)  (getLC p) 
+alex_action_2 =  \p s -> Return p 
+alex_action_3 =  \p s -> BeginScope p 
+alex_action_4 =  \p s -> EndScope p 
+alex_action_5 =  \p s -> BeginBracket p 
+alex_action_6 =  \p s -> EndBracket p 
+alex_action_7 =  \p s -> SemiColon p 
+alex_action_8 =  \p s -> Comma p 
+alex_action_9 =  \p s -> Type p s 
+alex_action_10 =  \p s -> Type p s 
+alex_action_11 =  \p s -> Type p s 
+alex_action_12 =  \p s -> Type p s 
+alex_action_13 =  \p s -> Equal p 
+alex_action_14 =  \p s -> Assign p 
+alex_action_15 =  \p s -> Different p 
+alex_action_16 =  \p s -> Greater p 
+alex_action_17 =  \p s -> Less p 
+alex_action_18 =  \p s -> GreaterOrEqual p 
+alex_action_19 =  \p s -> LessOrEqual p 
+alex_action_20 =  \p s -> Plus p 
+alex_action_21 =  \p s -> Mult p 
+alex_action_22 =  \p s -> Div p 
+alex_action_23 =  \p s -> While p 
+alex_action_24 =  \p s -> If p 
+alex_action_25 =  \p s -> Else p 
+alex_action_26 =  \p s -> OpOr p 
+alex_action_27 =  \p s -> OpNot p 
+alex_action_28 =  \p s -> OpAnd p 
+alex_action_29 =  \p s -> Int p ( read s) 
+alex_action_30 =  \p s -> Float p (read s) 
+alex_action_31 =  \p s -> Char p ( head s ) 
+alex_action_32 =  \p s -> Boolean p (read s) 
+alex_action_33 =  \p s -> Boolean p (read s) 
+alex_action_34 =  \p s -> Var p s 
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- -----------------------------------------------------------------------------
 -- ALEX TEMPLATE

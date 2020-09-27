@@ -1,11 +1,11 @@
--- Programa de fatorial 
+//programa fatorial
 int main() {
-  int n = 3;
+  float n = 3;
   int result = 1;
 
   while( n > 1) {
     result = result * n;
-    n = n-1;
+    n = 1;
   }
   return 0;
 }
