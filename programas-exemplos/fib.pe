@@ -1,5 +1,5 @@
 int fib(int n) {
-  if ( n <= 1L) 
+  if ( n <= 1) 
     return n;
 
   return fib(n-1) + fib(n-2);
@@ -7,5 +7,10 @@ int fib(int n) {
 
 int main(){
 	int r = fib(3);
+    dna d = "CATGAAAC.GTT";
+    dna d2 = "CAGAAAC.G"
+    rna rn = "CAUGA.AACGUU";
+    protein p = "DABCDEFGHIKLMNQABCDEFGHTVWXYZRSKLMNPQRSTVWXABNPQRSTVWXYZYAKLMNPQR";
+    string s = "A";
   return 0;
 }
