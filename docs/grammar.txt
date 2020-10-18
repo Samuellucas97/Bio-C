@@ -1,0 +1,42 @@
+
+<program> ::= <declarations> <functions> <main>
+
+<declarations> ::= [ <declaration> ";" ] 
+<declaration> ::= <var_declaration> | <var_assign> | <const_declaration>
+<const_declaration> ::= "define" TYPE ID "=" LITERAL
+
+<functions> ::= [ <function> ]
+<function> ::= TYPE ID "(" <params> ")" <block>
+<params> ::= [ <param> ]
+<param> ::= TYPE ID
+
+<main> ::= INT_TYPE "main" "(" <main_args> ")" <block>
+<main_args> ::= "" | <argc> "," <argv>
+<argc> ::= INT_TYPE ID
+<argv> :: STR_LIST_TYPE ID
+
+<block> ::= "{" <statements> "}"
+<statements> ::= [ <statement> ]
+<statement> ::= <var_declaration> ";" | <var_assign> ";" | <condition> | <loop> | <function_call> ";" | <return_expr> ";"
+
+<var_declaration> ::= TYPE ID <opt_assign>
+<opt_assign> ::= "" | <assign_type> <expr>
+
+<var_assign> ::= ID <assign_type> <expr>
+<assign_type> ::= "="
+
+<condition> ::= "if" "(" <expr> ")" <block> |
+                "if" "(" <expr> ")" <block> "else" <condition> | 
+                "if" "(" <expr> ")" <block> "else" <block>
+
+<loop> ::= "while" "(" <expr> ")" <block>
+
+<function_call> ::= ID "(" <args> ")"
+<args> ::= [ <expr> ]
+
+<expr> ::= <un_operator> <expr> | <expr> <bin_operator> <expr> | "(" <expr> ")" | <simple_expr>
+<simple_expr> := ID | LITERAL | <function_call>
+
+<un_operator> ::= NOT_OPERATOR | NEG_OPERATOR 
+
+<bin_operator> ::=  AND_OPERATOR | OR_OPERATOR | EQUALS_OPERATOR | GREATER_OPERATOR | LESS_OPERATOR | GREATER_EQUAL_OPERATOR | LESS_EQUAL_OPERATOR | DIFF_OPERATOR | SUM_OPERATOR | SUB_OPERATOR | DIV_OPERATOR | MULT_OPERATOR | MOD_OPERATOR | POW_OPERATOR 

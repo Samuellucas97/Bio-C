@@ -1,5 +1,9 @@
 {
-module Main (main, Token(..), AlexPosn(..), alexScanTokens) where
+--module Main (main, Token(..), AlexPosn(..), alexScanTokens) where
+module Lexer where
+
+import System.IO
+import System.IO.Unsafe
 }
 
 %wrapper "posn"
@@ -19,6 +23,8 @@ tokens :-
   $white+                         ;
   "//".*.                         ;
   "return"                        { \p s -> Return p }
+  "define"                        { \p s -> Define p }
+  "main"                          { \p s -> Main p }
   "{"                             { \p s -> BeginScope p }
   "}"                             { \p s -> EndScope p }
   "("                             { \p s -> BeginBracket p }
@@ -47,6 +53,7 @@ tokens :-
   "*"                             { \p s -> Mult p }
   "/"                             { \p s -> Div p }
   "%"                             { \p s -> Mod p }
+  "^"                             { \p s -> Pow p }
   while                           { \p s -> While p }
   if                              { \p s -> If p }
   else                            { \p s -> Else p }
@@ -71,6 +78,8 @@ tokens :-
 -- The token type:
 data Token =
   Return             AlexPosn |
+  Define             AlexPosn |
+  Main               AlexPosn | 
   BeginScope         AlexPosn |
   EndScope           AlexPosn |
   BeginBracket       AlexPosn |
@@ -92,6 +101,7 @@ data Token =
   Mult               AlexPosn |
   Div                AlexPosn |
   Mod                AlexPosn |
+  Pow                AlexPosn |
   While              AlexPosn |
   If                 AlexPosn |
   Else               AlexPosn |
@@ -109,7 +119,10 @@ data Token =
   Var AlexPosn String 
   deriving (Eq,Show)
 
-main = do
-  s <- getContents
-  print (alexScanTokens s)
+getTokens fn = unsafePerformIO (getTokensAux fn)
+
+getTokensAux fn = do {fh <- openFile fn ReadMode;
+                      s <- hGetContents fh;
+                      return (alexScanTokens s)}
 }
+

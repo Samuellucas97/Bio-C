@@ -1,4 +1,4 @@
-int fib(int n) {
+define fib(int n) {
   if ( n <= 1) 
     return n;
 
