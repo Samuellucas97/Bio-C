@@ -1,5 +1,11 @@
 
-<program> ::= <declarations> <functions> <main>
+<program> ::= <structs> <declarations> <functions> <main>
+
+<structs> ::= [struct]
+<struct> ::= "struct" ID <struct_block>          
+<struct_block> ::= "{" <attributes>  "}"
+<attributes> ::= [ <attribute> ";" ]
+<atribute> ::= TYPE ID
 
 <declarations> ::= [ <declaration> ";" ] 
 <declaration> ::= <var_declaration> | <var_assign> | <const_declaration>
@@ -19,7 +25,7 @@
 <statements> ::= [ <statement> ]
 <statement> ::= <var_declaration> ";" | <var_assign> ";" | <condition> | <loop> | <function_call> ";" | <return_expr> ";"
 
-<var_declaration> ::= TYPE ID <opt_assign>
+<var_declaration> ::= TYPE ID <opt_assign> | <array>
 <opt_assign> ::= "" | <assign_type> <expr>
 
 <var_assign> ::= ID <assign_type> <expr>
@@ -40,3 +46,10 @@
 <un_operator> ::= NOT_OPERATOR | NEG_OPERATOR 
 
 <bin_operator> ::=  AND_OPERATOR | OR_OPERATOR | EQUALS_OPERATOR | GREATER_OPERATOR | LESS_OPERATOR | GREATER_EQUAL_OPERATOR | LESS_EQUAL_OPERATOR | DIFF_OPERATOR | SUM_OPERATOR | SUB_OPERATOR | DIV_OPERATOR | MULT_OPERATOR | MOD_OPERATOR | POW_OPERATOR 
+
+<array> ::= TYPE "[" <array_size> "]" ID <array_assign> ";"            
+<array_assign> ::= "" | "=" <array_def>
+<array_size> ::= INT_LITERAL | INT_LITERAL "," <array_size>
+<array_def> ::= "[" <elements> "]"
+<elements> ::= <element> | <element> "," <elements>
+<elements> ::= <array_def> | <expr>

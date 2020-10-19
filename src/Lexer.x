@@ -32,6 +32,7 @@ tokens :-
   "]"                             { \s -> EndSquareBracket}
   ";"                             { \s -> SemiColon}
   ","                             { \s -> Comma}
+  "struct"                        { \s -> Struct}
   int                             { \s -> Type s}
   float                           { \s -> Type s}
   char                            { \s -> Type s}
@@ -40,6 +41,7 @@ tokens :-
   dna                             { \s -> Type s}
   rna                             { \s -> Type s}
   protein                         { \s -> Type s}
+  void                            { \s -> Type s}
   "=="                            { \s -> Equal}
   "="                             { \s -> Assign}
   "!="                            { \s -> Different}
@@ -87,6 +89,7 @@ data Token =
   EndSquareBracket    |
   SemiColon           |
   Comma               |
+  Struct              |
   Type         String |
   Equal               |
   Assign              |
@@ -115,6 +118,7 @@ data Token =
   Dna          String |
   Rna          String |
   Protein      String |
+  Void         String |
   Var  String 
   deriving (Eq,Show)
 
