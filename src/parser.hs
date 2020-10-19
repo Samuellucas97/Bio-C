@@ -63,6 +63,51 @@ structToken = tokenPrim show update_pos get_token where
   get_token (Struct p) = Just (Struct p)
   get_token _     = Nothing
 
+defineToken :: ParsecT [Token] st Identity Token
+defineToken = tokenPrim show update_pos get_token where
+  get_token (Define p) = Just (Define p)
+  get_token _     = Nothing
+
+intToken :: ParsecT [Token] st Identity Token
+intToken = tokenPrim show update_pos get_token where
+  get_token (Int p s) = Just (Int p s)
+  get_token _       = Nothing
+
+floatToken :: ParsecT [Token] st Identity Token
+floatToken = tokenPrim show update_pos get_token where
+  get_token (Float p s) = Just (Float p s)
+  get_token _       = Nothing
+
+charToken :: ParsecT [Token] st Identity Token
+charToken = tokenPrim show update_pos get_token where
+  get_token (Char p s) = Just (Char p s)
+  get_token _       = Nothing
+
+booleanToken :: ParsecT [Token] st Identity Token
+booleanToken = tokenPrim show update_pos get_token where
+  get_token (Boolean p s) = Just (Boolean p s)
+  get_token _       = Nothing
+{-
+dnaToken :: ParsecT [Token] st Identity Token
+dnaToken = tokenPrim show update_pos get_token where
+  get_token (Dna p s) = Just (Dna p s)
+  get_token _       = Nothing
+
+rnaToken :: ParsecT [Token] st Identity Token
+rnaToken = tokenPrim show update_pos get_token where
+  get_token (Rna p s) = Just (Rna p s)
+  get_token _       = Nothing
+
+proteinToken :: ParsecT [Token] st Identity Token
+proteinToken = tokenPrim show update_pos get_token where
+  get_token (Protein p s) = Just (Protein p s)
+  get_token _       = Nothing -}
+
+stringToken :: ParsecT [Token] st Identity Token
+stringToken = tokenPrim show update_pos get_token where
+  get_token (String p s) = Just (String p s)
+  get_token _       = Nothing
+
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos
 update_pos pos _ (tok:_) = pos -- necessita melhoria
 update_pos pos _ []      = pos
@@ -73,10 +118,11 @@ update_pos pos _ []      = pos
 program :: Parsec [Token] st [Token]
 program = do
         a <- structs
-    --    b <- idToken 
+        b <- declarations
+        --c < functions
         d <- main_
         eof
-        return (a++d)
+        return (a++b++d)
 
 structs :: Parsec [Token] st [Token]
 structs = (do
@@ -106,15 +152,10 @@ attributes = (do
 
 attribute :: Parsec [Token] st [Token]
 attribute = (do 
-        a <- typeToken
-        b <- idToken
-        c <- semiColonToken
-        return ([a] ++ [b] ++ [c]))<|>(do
-        a <- idToken
+        a <- typeToken <|> idToken
         b <- idToken
         c <- semiColonToken
         return ([a] ++ [b] ++ [c]))
-
 
 remaining_struct :: Parsec [Token] st [Token]
 remaining_struct = (do 
@@ -126,15 +167,46 @@ remaining_attribute = (do
         b <- attributes
         return (b)) <|> (return [])
 
+declarations :: Parsec [Token] st [Token]
+declarations = (do
+        first <- declaration
+        next <- remaining_declaration
+        return (first ++ next)) <|> (return [])
+
+declaration :: Parsec [Token] st [Token]
+declaration = (do
+        a <- constDeclaration <|> varAssign <|>
+        return(a))
+
+constDeclaration :: Parsec [Token] st [Token]
+constDeclaration = do 
+        a <- defineToken
+        b <- typeToken
+        c <- idToken
+        d <- assignToken
+        e <- literal
+        f <- semiColonToken
+        --return(a:b:c:d:e ++ [f])
+        return ([a] ++ [b] ++ [c] ++ [d] ++ e ++ [f])
+
+literal :: Parsec [Token] st [Token]
+literal = do 
+        a <- intToken <|> charToken  <|> booleanToken <|> {- dnaToken <|> dnaToken <|> rnaToken <|> proteinToken <|> -} stringToken
+        return ([a])
+
+remaining_declaration :: Parsec [Token] st [Token]
+remaining_declaration = (do a <- declarations
+                            return (a)) <|> (return [])
+
 main_ :: Parsec [Token] st [Token]
 main_ = do
-        a <- typeToken
+        --a <- typeToken
         b <- mainToken
         c <- beginBracketToken
       --  d <- 
         e <- endBracketToken
         f <- block
-        return ([b] ++ [c] ++ [e] ++ f)
+        return ( [b] ++ [c] ++ [e] ++ f)
 
 block :: Parsec [Token] st [Token]
 block = do
@@ -146,17 +218,17 @@ block = do
  
 stmts :: Parsec [Token] st [Token]
 stmts = (do
-          first <- assign
+          first <- varAssign
           next <- remaining_stmts
           return (first ++ next)) <|>
         (do 
-          first <- declaration
+          first <- varDeclaration
           next <- remaining_stmts
           return (first ++ next))
           <|> (return [])
 
-declaration :: Parsec [Token] st [Token]
-declaration = (do
+varDeclaration :: Parsec [Token] st [Token]
+varDeclaration = (do
           a <- typeToken
           b <- idToken
           c <- optAssign
@@ -177,14 +249,18 @@ expr  = (do
 simpleExpr :: Parsec [Token] st [Token]
 simpleExpr  = (do 
         a <- idToken
-        return ([a]))
+        return ([a])) <|> (do 
+        a <- literal
+        return (a))
 
-assign :: Parsec [Token] st [Token]
-assign = do
+varAssign :: Parsec [Token] st [Token]
+varAssign = do
           a <- idToken
-          b <- assignToken
-          c <- semiColonToken
-          return ([a] ++ [b] ++ [c])
+          --b <- squareBrackets
+          c <- assignToken
+          d <- expr
+          e <- semiColonToken
+          return ([a] ++ [c] ++ d ++[e])
 
 remaining_stmts :: Parsec [Token] st [Token]
 remaining_stmts = (do a <- stmts
