@@ -175,7 +175,7 @@ declarations = (do
 
 declaration :: Parsec [Token] st [Token]
 declaration = (do
-        a <- constDeclaration <|> varAssign <|>
+        a <- constDeclaration <|> varAssign 
         return(a))
 
 constDeclaration :: Parsec [Token] st [Token]
