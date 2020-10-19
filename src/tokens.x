@@ -23,7 +23,8 @@ tokens :-
   $white+                         ;
   "//".*.                         ;
   "return"                        { \p s -> Return p }
-  "define"                        { \p s -> Define p }
+  "const"                         { \p s -> Const p }
+  "def"                           { \p s -> Def p }
   "main"                          { \p s -> Main p }
   "{"                             { \p s -> BeginScope p }
   "}"                             { \p s -> EndScope p }
@@ -81,7 +82,8 @@ tokens :-
 -- The token type:
 data Token =
   Return             AlexPosn |
-  Define             AlexPosn |
+  Const              AlexPosn |
+  Def                AlexPosn |
   Main               AlexPosn | 
   BeginScope         AlexPosn |
   EndScope           AlexPosn |
