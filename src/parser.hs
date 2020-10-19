@@ -10,9 +10,9 @@ mainToken = tokenPrim show update_pos get_token where
   get_token Main    = Just Main
   get_token _       = Nothing
 
-{-idToken = tokenPrim show update_pos get_token where
+idToken = tokenPrim show update_pos get_token where
   get_token (Var x) = Just (Var x)
-  get_token _      = Nothing-}
+  get_token _      = Nothing
 
 beginScopeToken = tokenPrim show update_pos get_token where
   get_token BeginScope = Just BeginScope
@@ -39,9 +39,9 @@ semiColonToken = tokenPrim show update_pos get_token where
   get_token Assign = Just Assign
   get_token _      = Nothing-}
 
-{-intToken = tokenPrim show update_pos get_token where
-  get_token (Int x) = Just (Int x)
-  get_token _       = Nothing-}
+intToken = tokenPrim show update_pos get_token where
+  get_token (Type x) = Just (Type x)
+  get_token _       = Nothing
 
 {-returnToken = tokenPrim show update_pos get_token where
   get_token Return = Just Return
@@ -77,12 +77,27 @@ main_ = do
 block :: Parsec [Token] st [Token]
 block = do
 	a <- beginScopeToken
-	--b <- stmts
+	b <- stmts
 	c <- endScopeToken
-	return ([a] ++ [c])
+	return ([a] ++ b ++ [c])
 
+ 
+stmts :: Parsec [Token] st [Token]
+stmts = do
+          first <- assign
+          next <- remaining_stmts
+          return (first ++ next)
 
+assign :: Parsec [Token] st [Token]
+assign = do
+          a <- intToken
+          b <- idToken
+          c <- semiColonToken
+          return ([a] ++ [b] ++ [c])
 
+remaining_stmts :: Parsec [Token] st [Token]
+remaining_stmts = (do b <- stmts
+                      return (b)) <|> (return [])
 
 
 

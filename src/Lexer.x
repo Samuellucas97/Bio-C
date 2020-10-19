@@ -23,7 +23,7 @@ tokens :-
   "//".*.                         ;
   "return"                        { \s -> Return}
   "define"                        { \s -> Define}
-  "main"                          { \s -> Main}
+  "int main"                      { \s -> Main} 
   "{"                             { \s -> BeginScope}
   "}"                             { \s -> EndScope}
   "("                             { \s -> BeginBracket}
