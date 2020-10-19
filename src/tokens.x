@@ -33,6 +33,7 @@ tokens :-
   "]"                             { \p s -> EndSquareBracket p }
   ";"                             { \p s -> SemiColon p }
   ","                             { \p s -> Comma p }
+  "struct"                        { \p s -> Struct p }
   int                             { \p s -> Type p s }
   float                           { \p s -> Type p s }
   char                            { \p s -> Type p s }
@@ -41,6 +42,7 @@ tokens :-
   dna                             { \p s -> Type p s }
   rna                             { \p s -> Type p s }
   protein                         { \p s -> Type p s }
+  void                            { \p s -> Type p s }
   "=="                            { \p s -> Equal p }
   "="                             { \p s -> Assign p }
   "!="                            { \p s -> Different p }
@@ -88,6 +90,7 @@ data Token =
   EndSquareBracket   AlexPosn |
   SemiColon          AlexPosn |
   Comma              AlexPosn |
+  Struct             AlexPosn |
   Type        AlexPosn String |
   Equal              AlexPosn |
   Assign             AlexPosn |
@@ -116,6 +119,7 @@ data Token =
   Dna         AlexPosn String |
   Rna         AlexPosn String |
   Protein     AlexPosn String |
+  Void        AlexPosn String |
   Var AlexPosn String 
   deriving (Eq,Show)
 
