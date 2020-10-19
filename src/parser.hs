@@ -200,13 +200,13 @@ remaining_declaration = (do a <- declarations
 
 main_ :: Parsec [Token] st [Token]
 main_ = do
-        --a <- typeToken
+        a <- typeToken
         b <- mainToken
         c <- beginBracketToken
       --  d <- 
         e <- endBracketToken
         f <- block
-        return ( [b] ++ [c] ++ [e] ++ f)
+        return ( [a] ++ [b] ++ [c] ++ [e] ++ f)
 
 block :: Parsec [Token] st [Token]
 block = do
