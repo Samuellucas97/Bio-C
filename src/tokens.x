@@ -32,6 +32,7 @@ tokens :-
   ")"                             { \p s -> EndBracket p }
   "["                             { \p s -> BeginSquareBracket p }
   "]"                             { \p s -> EndSquareBracket p }
+  ":"                             { \p s -> Colon p }
   ";"                             { \p s -> SemiColon p }
   ","                             { \p s -> Comma p }
   "."                             { \p s -> Dot p }
@@ -91,6 +92,7 @@ data Token =
   EndBracket         AlexPosn |
   BeginSquareBracket AlexPosn |
   EndSquareBracket   AlexPosn |
+  Colon              AlexPosn |
   SemiColon          AlexPosn |
   Comma              AlexPosn |
   Dot                AlexPosn |

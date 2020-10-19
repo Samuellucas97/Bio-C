@@ -7,16 +7,14 @@ struct ABB{
     Node root;
 }
 
-define int global1 = 10;
-define int global2 = 100;
-define int global3 = 1000;
-define int global4 = 10000;
-define int global5 = 100000;
+const int global1 = 10;
+const int global2 = 100;
 global1 = global5;
 global3 = 111;
-define dna r = "ATUG";
+const dna r = "ATUG";
+int teste = "1";
 
-int main (){
+def main () : int{
     int x;
     protein x = x;
     rna x = x;
