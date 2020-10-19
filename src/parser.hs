@@ -1,4 +1,4 @@
-module Parser (main) where
+module Main (main) where
 
 import Lexer
 import Text.Parsec
@@ -10,9 +10,9 @@ mainToken = tokenPrim show update_pos get_token where
   get_token Main    = Just Main
   get_token _       = Nothing
 
-idToken = tokenPrim show update_pos get_token where
+{-idToken = tokenPrim show update_pos get_token where
   get_token (Var x) = Just (Var x)
-  get_token _      = Nothing
+  get_token _      = Nothing-}
 
 beginScopeToken = tokenPrim show update_pos get_token where
   get_token BeginScope = Just BeginScope
@@ -35,17 +35,17 @@ semiColonToken = tokenPrim show update_pos get_token where
   get_token SemiColon = Just SemiColon
   get_token _         = Nothing
 
-assignToken = tokenPrim show update_pos get_token where
+{-assignToken = tokenPrim show update_pos get_token where
   get_token Assign = Just Assign
-  get_token _      = Nothing
+  get_token _      = Nothing-}
 
-intToken = tokenPrim show update_pos get_token where
+{-intToken = tokenPrim show update_pos get_token where
   get_token (Int x) = Just (Int x)
-  get_token _       = Nothing
+  get_token _       = Nothing-}
 
-returnToken = tokenPrim show update_pos get_token where
+{-returnToken = tokenPrim show update_pos get_token where
   get_token Return = Just Return
-  get_token _     = Nothing
+  get_token _     = Nothing-}
 
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos
 update_pos pos _ (tok:_) = pos -- necessita melhoria
@@ -67,13 +67,12 @@ program = do
 
 main_ :: Parsec [Token] st [Token]
 main_ = do
-	a <- intToken
 	b <- mainToken
 	c <- beginBracketToken
 --	d <- 
 	e <- endBracketToken
 	f <- block
-	return (a ++ b ++ c ++ e ++ f)
+	return ([b] ++ [c] ++ [e] ++ f)
 
 block :: Parsec [Token] st [Token]
 block = do
