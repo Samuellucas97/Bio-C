@@ -43,6 +43,11 @@ semiColonToken = tokenPrim show update_pos get_token where
   get_token (SemiColon p) = Just (SemiColon p)
   get_token _         = Nothing
 
+colonToken :: Parsec [Token] st Token
+colonToken = tokenPrim show update_pos get_token where
+  get_token (Colon p) = Just (Colon p)
+  get_token _         = Nothing
+
 assignToken :: ParsecT [Token] st Identity Token
 assignToken = tokenPrim show update_pos get_token where
   get_token (Assign p) = Just (Assign p)
@@ -63,9 +68,14 @@ structToken = tokenPrim show update_pos get_token where
   get_token (Struct p) = Just (Struct p)
   get_token _     = Nothing
 
-defineToken :: ParsecT [Token] st Identity Token
-defineToken = tokenPrim show update_pos get_token where
-  get_token (Define p) = Just (Define p)
+defToken :: ParsecT [Token] st Identity Token
+defToken = tokenPrim show update_pos get_token where
+  get_token (Def p) = Just (Def p)
+  get_token _     = Nothing
+
+constToken :: ParsecT [Token] st Identity Token
+constToken = tokenPrim show update_pos get_token where
+  get_token (Const p) = Just (Const p)
   get_token _     = Nothing
 
 intToken :: ParsecT [Token] st Identity Token
@@ -113,7 +123,6 @@ update_pos pos _ (tok:_) = pos -- necessita melhoria
 update_pos pos _ []      = pos
 
 -- parsers para os não-terminais
-
 
 program :: Parsec [Token] st [Token]
 program = do
@@ -175,12 +184,12 @@ declarations = (do
 
 declaration :: Parsec [Token] st [Token]
 declaration = (do
-        a <- constDeclaration <|> varAssign 
+        a <- constDeclaration <|> varAssign <|> varDeclaration
         return(a))
 
 constDeclaration :: Parsec [Token] st [Token]
 constDeclaration = do 
-        a <- defineToken
+        a <- constToken
         b <- typeToken
         c <- idToken
         d <- assignToken
@@ -200,13 +209,15 @@ remaining_declaration = (do a <- declarations
 
 main_ :: Parsec [Token] st [Token]
 main_ = do
-        a <- typeToken
+        a <- defToken
         b <- mainToken
         c <- beginBracketToken
       --  d <- 
         e <- endBracketToken
-        f <- block
-        return ( [a] ++ [b] ++ [c] ++ [e] ++ f)
+        f <- colonToken
+        g <- typeToken
+        h <- block
+        return ( [a] ++ [b] ++ [c] ++ [e] ++ [f] ++ [g] ++ h)
 
 block :: Parsec [Token] st [Token]
 block = do
