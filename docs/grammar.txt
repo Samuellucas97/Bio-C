@@ -5,7 +5,7 @@
 <struct> ::= "struct" ID <struct_block>          
 <struct_block> ::= "{" <attributes>  "}"
 <attributes> ::= [ <attribute> ";" ]
-<atribute> ::= TYPE ID
+<atribute> ::= TYPE ID | ID ID
 
 <declarations> ::= [ <declaration> ";" ] 
 <declaration> ::= <var_declaration> | <var_assign> | <const_declaration>

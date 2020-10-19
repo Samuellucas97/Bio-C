@@ -6,15 +6,6 @@ import Lexer
 import Text.Parsec
 
 
---typeToken :: ParsecT [Token] st Identity Token
---typeToken = tokenPrim show update_pos get_token where
---  get_token (Type p s) = Just (Type p s)
---  get_token _       = Nothing
-
---semiColonToken :: Parsec [Token] st Token
---semiColonToken = tokenPrim show update_pos get_token where
---  get_token (SemiColon p) = Just (SemiColon p)
---  get_token _         = Nothing
 -- parsers para os tokens
 
 mainToken :: ParsecT [Token] st Identity Token
@@ -67,6 +58,11 @@ returnToken = tokenPrim show update_pos get_token where
   get_token (Return p) = Just (Return p)
   get_token _     = Nothing
 
+structToken :: ParsecT [Token] st Identity Token
+structToken = tokenPrim show update_pos get_token where
+  get_token (Struct p) = Just (Struct p)
+  get_token _     = Nothing
+
 update_pos :: SourcePos -> Token -> [Token] -> SourcePos
 update_pos pos _ (tok:_) = pos -- necessita melhoria
 update_pos pos _ []      = pos
@@ -76,28 +72,76 @@ update_pos pos _ []      = pos
 
 program :: Parsec [Token] st [Token]
 program = do
---    a <- 
---    b <- idToken 
-    c <- main_
-    eof
-    return c
+        a <- structs
+    --    b <- idToken 
+        d <- main_
+        eof
+        return (a++d)
+
+structs :: Parsec [Token] st [Token]
+structs = (do
+        first <- struct
+        next <- remaining_struct
+        return (first ++ next)) <|> (return [])
+
+struct :: Parsec [Token] st [Token]
+struct = (do
+        a <- structToken
+        b <- idToken
+        c <- struct_block
+        return([a]++[b]++c))
+
+struct_block :: Parsec [Token] st [Token]
+struct_block = do
+        a <- beginScopeToken
+        b <- attributes
+        c <- endScopeToken
+        return ([a] ++ b ++ [c])
+
+attributes :: Parsec [Token] st [Token]
+attributes = (do
+        first <- attribute
+        next <- remaining_attribute
+        return (first ++ next)) -- <|> (return [])
+
+attribute :: Parsec [Token] st [Token]
+attribute = (do 
+        a <- typeToken
+        b <- idToken
+        c <- semiColonToken
+        return ([a] ++ [b] ++ [c]))<|>(do
+        a <- idToken
+        b <- idToken
+        c <- semiColonToken
+        return ([a] ++ [b] ++ [c]))
+
+
+remaining_struct :: Parsec [Token] st [Token]
+remaining_struct = (do 
+        a <- structs
+        return (a)) <|> (return [])
+
+remaining_attribute :: Parsec [Token] st [Token]
+remaining_attribute = (do 
+        b <- attributes
+        return (b)) <|> (return [])
 
 main_ :: Parsec [Token] st [Token]
 main_ = do
-  a <- typeToken
-  b <- mainToken
-  c <- beginBracketToken
---  d <- 
-  e <- endBracketToken
-  f <- block
-  return ([b] ++ [c] ++ [e] ++ f)
+        a <- typeToken
+        b <- mainToken
+        c <- beginBracketToken
+      --  d <- 
+        e <- endBracketToken
+        f <- block
+        return ([b] ++ [c] ++ [e] ++ f)
 
 block :: Parsec [Token] st [Token]
 block = do
-  a <- beginScopeToken
-  b <- stmts
-  c <- endScopeToken
-  return ([a] ++ b ++ [c])
+        a <- beginScopeToken
+        b <- stmts
+        c <- endScopeToken
+        return ([a] ++ b ++ [c])
 
  
 stmts :: Parsec [Token] st [Token]
@@ -143,8 +187,8 @@ assign = do
           return ([a] ++ [b] ++ [c])
 
 remaining_stmts :: Parsec [Token] st [Token]
-remaining_stmts = (do b <- stmts
-                      return (b)) <|> (return [])
+remaining_stmts = (do a <- stmts
+                      return (a)) <|> (return [])
 --program :: Parsec [Token] st [Token]
 --program = do
 --    a <- 

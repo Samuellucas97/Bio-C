@@ -33,6 +33,7 @@ tokens :-
   "]"                             { \p s -> EndSquareBracket p }
   ";"                             { \p s -> SemiColon p }
   ","                             { \p s -> Comma p }
+  "."                             { \p s -> Dot p }
   "struct"                        { \p s -> Struct p }
   int                             { \p s -> Type p s }
   float                           { \p s -> Type p s }
@@ -90,6 +91,7 @@ data Token =
   EndSquareBracket   AlexPosn |
   SemiColon          AlexPosn |
   Comma              AlexPosn |
+  Dot                AlexPosn |
   Struct             AlexPosn |
   Type        AlexPosn String |
   Equal              AlexPosn |
