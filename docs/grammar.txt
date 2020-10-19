@@ -5,42 +5,80 @@
 <struct> ::= "struct" ID <struct_block>          
 <struct_block> ::= "{" <attributes>  "}"
 <attributes> ::= [ <attribute> ";" ]
-<atribute> ::= TYPE ID | ID ID
+<atribute> ::= TYPE <square_brackets> ID | ID <square_brackets> ID
+
+
+
+
 
 <declarations> ::= [ <declaration> ";" ] 
 <declaration> ::= <var_declaration> | <var_assign> | <const_declaration>
 <const_declaration> ::= "define" TYPE ID "=" LITERAL
 
+
+
+
+
+
 <functions> ::= [ <function> ]
 <function> ::= TYPE ID "(" <params> ")" <block>
 <params> ::= [ <param> ]
-<param> ::= TYPE ID
+<param> ::= TYPE <sb_param> ID
+<sb_param> ::= "[" <sb_param_values> "]" | ""
+<sb_param_values> ::= <opt_expr> | <opt_expr> "," <sb_param_values>
+<opt_expr> ::= "" | <expr>
+
+
+
+
 
 <main> ::= INT_TYPE "main" "(" <main_args> ")" <block>
 <main_args> ::= "" | <argc> "," <argv>
 <argc> ::= INT_TYPE ID
 <argv> :: STR_LIST_TYPE ID
 
+
+
+
+
 <block> ::= "{" <statements> "}"
 <statements> ::= [ <statement> ]
 <statement> ::= <var_declaration> ";" | <var_assign> ";" | <condition> | <loop> | <function_call> ";" | <return_expr> ";"
 
+
+
+
+
+
+
+
 <var_declaration> ::= TYPE <square_brackets> ID <opt_assign>
 <opt_assign> ::= "" | <assign_type> <expr> | "=" <array_def>
 
-<var_assign> ::= ID <square_brackets> <assign_type> <expr> | 
+<var_assign> ::= <extended_id> <assign_type> <expr> | 
 
-<square_brackets> ::= "[" <square_bracket_values> "]"
+<square_brackets> ::= "[" <square_bracket_values> "]" | ""
 <square_brackets_values> ::= <expr> | <expr> "," <square_brackets_values>
+
+*exemplos: int[2] arr1; int[3,9+2] arr2; float[getSize(y)] arr3;
+
 <array_def> ::= "[" <elements> "]"
 <elements> ::= <element> | <element> "," <elements>
 <elements> ::= <array_def> | <expr>
 
-<assign_type> ::= "="
+<assign_type> ::= "=" | "+=" | ...
 
-<condition> ::= "if" "(" <expr> ")" <block> |
-                "if" "(" <expr> ")" <block> "else" <condition> | 
-                "if" "(" <expr> ")" <block> "else" <block>
+<extended_id> ::= ID <square_brackets> <attribute_access>
+
+<attribute_access> ::= "." <extended_id> | ""
+
+
+*exemplo: node[2,3].left.left[3,3]. ;
+
+
+
+<condition> ::= "if" "(" <expr> ")" <block> <elseCondition> 
+<elseCondition> ::= "else" {<condition> | <block>} | ""
 
 <loop> ::= "while" "(" <expr> ")" <block>
 
@@ -48,10 +86,8 @@
 <args> ::= [ <expr> ]
 
 <expr> ::= <un_operator> <expr> | <expr> <bin_operator> <expr> | "(" <expr> ")" | <simple_expr>
-<simple_expr> := ID | LITERAL | <function_call>
+<simple_expr> := <extended_id> | LITERAL | <function_call>
 
 <un_operator> ::= NOT_OPERATOR | NEG_OPERATOR 
 
-<bin_operator> ::=  AND_OPERATOR | OR_OPERATOR | EQUALS_OPERATOR | GREATER_OPERATOR | LESS_OPERATOR | GREATER_EQUAL_OPERATOR | LESS_EQUAL_OPERATOR | DIFF_OPERATOR | SUM_OPERATOR | SUB_OPERATOR | DIV_OPERATOR | MULT_OPERATOR | MOD_OPERATOR | POW_OPERATOR 
-         
-
+<bin_operator> ::=  AND_OPERATOR | OR_OPERATOR | EQUALS_OPERATOR | GREATER_OPERATOR | LESS_OPERATOR | GREATER_EQUAL_OPERATOR | LESS_EQUAL_OPERATOR | DIFF_OPERATOR | SUM_OPERATOR | SUB_OPERATOR | DIV_OPERATOR | MULT_OPERATOR | MOD_OPERATOR | POW_OPERATOR
