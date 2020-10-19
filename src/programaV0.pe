@@ -1,6 +1,5 @@
 int main(){
-	float o;
-	protein u;
-	float k;
-	protein pr;
+    int x;
+    protein x = x;
+    rna x = x;
 }
