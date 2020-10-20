@@ -168,12 +168,35 @@ stmts = (do
 
 stmt :: Parsec [Token] st [Token]
 stmt = (do
-        a <- varAssign <|> varDeclaration 
+        a <- function_call <|> varAssign <|> varDeclaration
         b <- semiColonToken
         return (a ++ [b])) <|> (do
         a <- loop
         return (a))
 
+function_call :: Parsec [Token] st [Token]
+function_call = (do
+        a <- idToken
+        b <- beginBracketToken
+        c <- opt_args
+        d <- endBracketToken
+        return ([a] ++ [b] ++ c ++ [d])
+        )
+
+opt_args :: Parsec [Token] st [Token]
+opt_args = (do
+        a <- args
+        return (a)) <|> (return [])
+
+args :: Parsec [Token] st [Token]
+args = (do
+        a <- expr
+        return (a)
+        ) <|> (do 
+        a <- expr
+        b <- semiColonToken
+        c <- args
+        return(a ++ [b] ++ c))
 
 remaining_stmts :: Parsec [Token] st [Token]
 remaining_stmts = (do 
