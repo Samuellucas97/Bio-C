@@ -82,8 +82,18 @@ OK ATÉ AQUI (sem argc e argv do main)
 <condition> ::= "if" "(" <expr> ")" <block> <elseCondition> 
 <elseCondition> ::= "else" {<condition> | <block>} | ""
 
+------------
+                  ||
+FIZEMOS ISSO TBM  \/
+------------
+
 <loop> ::= "while" "(" <expr> ")" <block>
 
+------------
+
+FIZEMOS ISSO TBM  /\
+                  ||
+------------
 <function_call> ::= ID "(" <args> ")"
 <args> ::= [ <expr> ]
 
