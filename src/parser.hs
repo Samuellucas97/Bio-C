@@ -168,10 +168,10 @@ stmts = (do
 
 stmt :: Parsec [Token] st [Token]
 stmt = (do
-        a <- varAssign <|> varDeclaration 
+        a <- varAssign <|> varDeclaration <|> return_
         b <- semiColonToken
         return (a ++ [b])) <|> (do
-        a <- loop
+        a <- loop <|> condition
         return (a))
 
 
@@ -290,11 +290,37 @@ remaining_sb_param_value = (do
 loop :: Parsec [Token] st [Token]
 loop = (do 
         a <- whileToken 
+        b <- commaExpr
+        e <- block
+        return ([a] ++ b ++ e))
+
+condition :: Parsec [Token] st [Token]
+condition = (do 
+        a <- ifToken 
+        b <- commaExpr
+        e <- block
+        --f <- [] <|> elseBlock <|> elseToken ++ condition
+        f <- opt_condition
+        return ([a] ++ b ++ e ++ f))
+
+opt_condition :: Parsec [Token] st [Token]
+opt_condition = (do 
+        a <- elseToken
+        b <- block <|> condition
+        return ([a] ++ b)) <|> (return [])
+
+commaExpr :: Parsec [Token] st [Token]
+commaExpr = (do 
         b <- beginBracketToken
         c <- expr
         d <- endBracketToken
-        e <- block
-        return ([a] ++ [b] ++ c ++ [d] ++ e))
+        return ([b] ++ c ++ [d]))
+
+return_ :: Parsec [Token] st [Token]
+return_ = (do 
+        a <- returnToken 
+        b <- expr
+        return ([a] ++ b))
 
 --program :: Parsec [Token] st [Token]
 --program = do

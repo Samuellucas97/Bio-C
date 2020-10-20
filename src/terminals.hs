@@ -67,6 +67,16 @@ dotToken = tokenPrim show update_pos get_token where
   get_token (Dot p) = Just (Dot p)
   get_token _         = Nothing
 
+ifToken :: Parsec [Token] st Token
+ifToken = tokenPrim show update_pos get_token where
+  get_token (If p) = Just (If p)
+  get_token _         = Nothing
+
+elseToken :: Parsec [Token] st Token
+elseToken = tokenPrim show update_pos get_token where
+  get_token (Else p) = Just (Else p)
+  get_token _         = Nothing
+
 assignToken :: ParsecT [Token] st Identity Token
 assignToken = tokenPrim show update_pos get_token where
   get_token (Assign p) = Just (Assign p)

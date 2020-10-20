@@ -39,4 +39,16 @@ def main () : int{
     int x;
     protein x = x;
     rna x = x;
+
+    if (x) {
+    	int k;
+    } else if (x) {
+
+    	int k;
+    } else {
+
+    	int j;
+    }
+
+    return 2;
 }

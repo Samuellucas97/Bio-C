@@ -79,8 +79,8 @@ OK ATÉ AQUI (sem argc e argv do main)
 
 
 
-<condition> ::= "if" "(" <expr> ")" <block> <elseCondition> 
-<elseCondition> ::= "else" {<condition> | <block>} | ""
+<condition> ::= "if" "(" <expr> ")" <block> <opt_condition>
+<opt_condition> ::= "else" {<condition> | <block>} | ""
 
 ------------
                   ||
