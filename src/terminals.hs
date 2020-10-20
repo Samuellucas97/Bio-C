@@ -62,6 +62,11 @@ colonToken = tokenPrim show update_pos get_token where
   get_token (Colon p) = Just (Colon p)
   get_token _         = Nothing
 
+dotToken :: Parsec [Token] st Token
+dotToken = tokenPrim show update_pos get_token where
+  get_token (Dot p) = Just (Dot p)
+  get_token _         = Nothing
+
 assignToken :: ParsecT [Token] st Identity Token
 assignToken = tokenPrim show update_pos get_token where
   get_token (Assign p) = Just (Assign p)

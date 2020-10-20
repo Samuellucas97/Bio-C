@@ -66,7 +66,7 @@ OK ATÉ AQUI (sem argc e argv do main)
 
 <array_def> ::= "[" <elements> "]"
 <elements> ::= <element> | <element> "," <elements>
-<elements> ::= <array_def> | <expr>
+<element> ::= <array_def> | <expr>
 
 <assign_type> ::= "=" | "+=" | ...
 

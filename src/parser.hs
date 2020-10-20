@@ -24,6 +24,19 @@ extended_type = (do
         a <- typeToken <|> idToken
         return ([a]))
 
+extended_id :: Parsec [Token] st [Token]
+extended_id = (do 
+        a <- idToken
+        b <- square_brackets
+        c <- attribute_access
+        return ([a]))
+
+attribute_access :: Parsec [Token] st [Token]
+attribute_access = (do 
+        a <- dotToken
+        b <- extended_id
+        return ([a])) <|> (return[])
+
 -- structs
 
 structs :: Parsec [Token] st [Token]
@@ -99,12 +112,13 @@ remaining_square_brackets_values = (do
 declarations :: Parsec [Token] st [Token]
 declarations = (do
         first <- declaration
+        second <- semiColonToken
         next <- remaining_declaration
-        return (first ++ next)) <|> (return [])
+        return (first ++ [second] ++ next)) <|> (return [])
 
 declaration :: Parsec [Token] st [Token]
 declaration = (do
-        a <- varDeclaration <|> varAssign <|> constDeclaration
+        a <- varAssign <|> varDeclaration <|> constDeclaration
         return(a))
 
 constDeclaration :: Parsec [Token] st [Token]
@@ -114,9 +128,9 @@ constDeclaration = do
         c <- idToken
         d <- assignToken
         e <- literal
-        f <- semiColonToken
+        --f <- semiColonToken
         --return(a:b:c:d:e ++ [f])
-        return ([a] ++ [b] ++ [c] ++ [d] ++ e ++ [f])
+        return ([a] ++ [b] ++ [c] ++ [d] ++ e)
 
 literal :: Parsec [Token] st [Token]
 literal = do 
@@ -154,8 +168,12 @@ stmts = (do
 
 stmt :: Parsec [Token] st [Token]
 stmt = (do
-        a <- varAssign <|> varDeclaration <|> loop
+        a <- varAssign <|> varDeclaration 
+        b <- semiColonToken
+        return (a ++ [b])) <|> (do
+        a <- loop
         return (a))
+
 
 remaining_stmts :: Parsec [Token] st [Token]
 remaining_stmts = (do 
@@ -164,11 +182,11 @@ remaining_stmts = (do
 
 varDeclaration :: Parsec [Token] st [Token]
 varDeclaration = (do
-          a <- typeToken
+          a <- extended_type
           b <- idToken
           c <- optAssign
-          d <- semiColonToken
-          return ([a] ++ [b] ++ c ++ [d]))
+          --d <- semiColonToken
+          return (a ++ [b] ++ c))
 
 optAssign :: Parsec [Token] st [Token]
 optAssign  = (do
@@ -190,12 +208,12 @@ simpleExpr  = (do
 
 varAssign :: Parsec [Token] st [Token]
 varAssign = do
-          a <- idToken
+          a <- extended_id
           --b <- squareBrackets
           c <- assignToken
           d <- expr
-          e <- semiColonToken
-          return ([a] ++ [c] ++ d ++[e])
+          --e <- semiColonToken
+          return (a ++ [c] ++ d)
 
 
 
