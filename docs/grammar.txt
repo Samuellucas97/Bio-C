@@ -7,9 +7,6 @@
 <attributes> ::= [ <attribute> ";" ]
 <atribute> ::= <extended_type> <square_brackets> ID 
 
-------------
-OK ATÉ AQUI
-------------
 
 
 <extended_type> ::= ID | TYPE
@@ -29,9 +26,8 @@ OK ATÉ AQUI
 <params> ::= [ <param> ]
 <param> ::= <extended_type> <sb_param> ID
 <sb_param> ::= "[" <sb_param_values> "]" | ""
-<sb_param_values> ::= <opt_expr> | <opt_expr> "," <sb_param_values>
-<opt_expr> ::= "" | <expr>
-
+<sb_param_values> ::= <sb_param_value> | <sb_param_value> "," <sb_param_values>
+<sb_param_value> ::= "" | <expr>
 
 
 
@@ -42,7 +38,9 @@ OK ATÉ AQUI
 <argv> :: STR_LIST_TYPE ID
 
 
-
+------------
+OK ATÉ AQUI (sem argc e argv do main)
+------------
 
 
 <block> ::= "{" <statements> "}"

@@ -12,10 +12,10 @@ program :: Parsec [Token] st [Token]
 program = do
         a <- structs
         b <- declarations
-        --c < functions
+        c <- functions
         d <- main_
         eof
-        return (a++b++d)
+        return (a++b++c++d)
 
 -- aux
 
@@ -129,7 +129,6 @@ remaining_declaration = (do a <- declarations
 
 main_ :: Parsec [Token] st [Token]
 main_ = do
-        a <- defToken
         b <- mainToken
         c <- beginBracketToken
       --  d <- 
@@ -137,7 +136,7 @@ main_ = do
         f <- colonToken
         g <- typeToken
         h <- block
-        return ( [a] ++ [b] ++ [c] ++ [e] ++ [f] ++ [g] ++ h)
+        return ( [b] ++ [c] ++ [e] ++ [f] ++ [g] ++ h)
 
 block :: Parsec [Token] st [Token]
 block = do
@@ -196,6 +195,77 @@ varAssign = do
 remaining_stmts :: Parsec [Token] st [Token]
 remaining_stmts = (do a <- stmts
                       return (a)) <|> (return [])
+
+
+
+functions :: Parsec [Token] st [Token]
+functions = (do
+        first <- function
+        next <- remaining_function
+        return (first ++ next)) <|> (return [])
+
+function :: Parsec [Token] st [Token]
+function = (do
+        a <- defToken
+        b <- idToken
+        c <- beginBracketToken
+        d <- params
+        e <- endBracketToken
+        f <- colonToken
+        g <- extended_type
+        h <- block
+        return([a] ++ [b] ++ [c] ++ d ++ [e] ++ [f] ++ g ++ h))
+
+remaining_function :: Parsec [Token] st [Token]
+remaining_function = (do 
+                      a <- functions
+                      return (a)) <|> (return [])
+
+
+params :: Parsec [Token] st [Token]
+params = (do
+        first <- param
+        next <- remaining_param
+        return (first ++ next)) <|> (return [])
+
+param :: Parsec [Token] st [Token]
+param = (do
+        a <- extended_type
+        b <- sb_param
+        c <- idToken
+        return(a ++ b ++ [c]))
+
+remaining_param :: Parsec [Token] st [Token]
+remaining_param = (do 
+                  a <- commaToken
+                  b <- params
+                  return ([a] ++ b)) <|> (return [])
+
+
+sb_param :: Parsec [Token] st [Token]
+sb_param = (do 
+            a <- beginSquareBracketToken
+            b <- sb_param_values
+            c <- endSquareBracketToken
+            return ([a] ++ b ++ [c])) <|> (return [])
+
+sb_param_values :: Parsec [Token] st [Token]
+sb_param_values = (do
+        first <- sb_param_value
+        next <- remaining_sb_param_value
+        return (first ++ next)) <|> (return [])
+
+sb_param_value :: Parsec [Token] st [Token]
+sb_param_value = (do
+        a <- expr
+        return(a)) <|> (return [])
+
+remaining_sb_param_value :: Parsec [Token] st [Token]
+remaining_sb_param_value = (do 
+                            a <- commaToken
+                            b <- sb_param_values
+                            return ([a] ++ b)) <|> (return [])
+
 --program :: Parsec [Token] st [Token]
 --program = do
 --    a <- 

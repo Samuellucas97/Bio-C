@@ -18,6 +18,18 @@ global3 = 111;
 const dna r = "ATUG";
 int teste = "1";
 
+
+def f1 () : int {
+	
+}
+
+def f2 (Node[,3,] tree) : void {
+	int x;
+    protein x = x;
+    rna x = x;		
+
+}
+
 def main () : int{
     int x;
     protein x = x;

@@ -24,8 +24,8 @@ tokens :-
   "//".*.                         ;
   "return"                        { \p s -> Return p }
   "const"                         { \p s -> Const p }
+  "def main"                      { \p s -> Main p }
   "def"                           { \p s -> Def p }
-  "main"                          { \p s -> Main p }
   "{"                             { \p s -> BeginScope p }
   "}"                             { \p s -> EndScope p }
   "("                             { \p s -> BeginBracket p }
