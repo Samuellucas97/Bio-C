@@ -154,13 +154,7 @@ stmts = (do
 
 stmt :: Parsec [Token] st [Token]
 stmt = (do
-        a <- varAssign
-        return (a)) <|>
-        (do 
-        a <- varDeclaration
-        return (a)) <|>
-        (do 
-        a <- loop_
+        a <- varAssign <|> varDeclaration <|> loop
         return (a))
 
 remaining_stmts :: Parsec [Token] st [Token]
@@ -275,14 +269,14 @@ remaining_sb_param_value = (do
                             b <- sb_param_values
                             return ([a] ++ b)) <|> (return [])
 
-loop_ :: Parsec [Token] st [Token]
-loop_ = (do 
-        d <- whileToken 
-        a <- beginBracketToken
-        b <- expr
-        c <- endBracketToken
+loop :: Parsec [Token] st [Token]
+loop = (do 
+        a <- whileToken 
+        b <- beginBracketToken
+        c <- expr
+        d <- endBracketToken
         e <- block
-        return ([d] ++ [a] ++ b ++ [c] ++ e)) <|> (return [])
+        return ([a] ++ [b] ++ c ++ [d] ++ e))
 
 --program :: Parsec [Token] st [Token]
 --program = do
