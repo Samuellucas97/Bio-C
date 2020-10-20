@@ -5,15 +5,19 @@
 <struct> ::= "struct" ID <struct_block>          
 <struct_block> ::= "{" <attributes>  "}"
 <attributes> ::= [ <attribute> ";" ]
-<atribute> ::= TYPE <square_brackets> ID | ID <square_brackets> ID
+<atribute> ::= <extended_type> <square_brackets> ID 
+
+------------
+OK ATÉ AQUI
+------------
 
 
-
+<extended_type> ::= ID | TYPE
 
 
 <declarations> ::= [ <declaration> ";" ] 
 <declaration> ::= <var_declaration> | <var_assign> | <const_declaration>
-<const_declaration> ::= "define" TYPE ID "=" LITERAL
+<const_declaration> ::= "const" TYPE ID "=" LITERAL
 
 
 
@@ -21,9 +25,9 @@
 
 
 <functions> ::= [ <function> ]
-<function> ::= TYPE ID "(" <params> ")" <block>
+<function> ::= "def" ID "(" <params> ")" ":" <extended_type> <block>
 <params> ::= [ <param> ]
-<param> ::= TYPE <sb_param> ID
+<param> ::= <extended_type> <sb_param> ID
 <sb_param> ::= "[" <sb_param_values> "]" | ""
 <sb_param_values> ::= <opt_expr> | <opt_expr> "," <sb_param_values>
 <opt_expr> ::= "" | <expr>
@@ -32,7 +36,7 @@
 
 
 
-<main> ::= INT_TYPE "main" "(" <main_args> ")" <block>
+<main> ::= "def" "main" "(" <main_args> ")" ":" INT_TYPE <block>
 <main_args> ::= "" | <argc> "," <argv>
 <argc> ::= INT_TYPE ID
 <argv> :: STR_LIST_TYPE ID
@@ -52,7 +56,7 @@
 
 
 
-<var_declaration> ::= TYPE <square_brackets> ID <opt_assign>
+<var_declaration> ::= <extended_type> <square_brackets> ID <opt_assign>
 <opt_assign> ::= "" | <assign_type> <expr> | "=" <array_def>
 
 <var_assign> ::= <extended_id> <assign_type> <expr> | 
@@ -73,7 +77,7 @@
 <attribute_access> ::= "." <extended_id> | ""
 
 
-*exemplo: node[2,3].left.left[3,3]. ;
+*exemplo: node[2,3].left.left[3,3].a ;
 
 
 

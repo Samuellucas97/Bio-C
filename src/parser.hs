@@ -17,6 +17,13 @@ program = do
         eof
         return (a++b++d)
 
+-- aux
+
+extended_type :: Parsec [Token] st [Token]
+extended_type = (do 
+        a <- typeToken <|> idToken
+        return ([a]))
+
 -- structs
 
 structs :: Parsec [Token] st [Token]
@@ -47,10 +54,11 @@ attributes = (do
 
 attribute :: Parsec [Token] st [Token]
 attribute = (do 
-        a <- typeToken <|> idToken
+        a <- extended_type
+        d <- square_brackets
         b <- idToken
         c <- semiColonToken
-        return ([a] ++ [b] ++ [c]))
+        return (a ++ d ++ [b] ++ [c]))
 
 remaining_struct :: Parsec [Token] st [Token]
 remaining_struct = (do 
@@ -64,27 +72,27 @@ remaining_attribute = (do
 
 square_brackets :: Parsec [Token] st [Token]
 square_brackets = (do 
-        a <- beginBracketToken
+        a <- beginSquareBracketToken
         b <- square_brackets_values
-        c <- endBracketToken
+        c <- endSquareBracketToken
         return ([a] ++ b ++ [c])) <|> (return [])
 
 square_brackets_values :: Parsec [Token] st [Token]
 square_brackets_values = (do
         first <- square_brackets_value
-        next <- remaining_square_bracket_values
+        next <- remaining_square_brackets_values
         return (first ++ next))
 
 square_brackets_value :: Parsec [Token] st [Token]
 square_brackets_value = (do 
         b <- idToken
-        return (b)
+        return ([b]))
 
 remaining_square_brackets_values :: Parsec [Token] st [Token]
 remaining_square_brackets_values = (do 
         a <- commaToken
         b <- square_brackets_values
-        return ([a] ++ [b])) <|> (return [])
+        return ([a] ++ b)) <|> (return [])
 
 -- declarations
 
@@ -96,7 +104,7 @@ declarations = (do
 
 declaration :: Parsec [Token] st [Token]
 declaration = (do
-        a <- constDeclaration <|> varAssign <|> varDeclaration
+        a <- varDeclaration <|> varAssign <|> constDeclaration
         return(a))
 
 constDeclaration :: Parsec [Token] st [Token]
@@ -112,7 +120,7 @@ constDeclaration = do
 
 literal :: Parsec [Token] st [Token]
 literal = do 
-        a <- intToken <|> charToken  <|> booleanToken <|> {- dnaToken <|> dnaToken <|> rnaToken <|> proteinToken <|> -} stringToken
+        a <- intToken <|> charToken  <|> booleanToken <|> stringToken {- dnaToken <|> dnaToken <|> rnaToken <|> proteinToken <|> -} 
         return ([a])
 
 remaining_declaration :: Parsec [Token] st [Token]
