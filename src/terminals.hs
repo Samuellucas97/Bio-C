@@ -92,6 +92,11 @@ constToken = tokenPrim show update_pos get_token where
   get_token (Const p) = Just (Const p)
   get_token _     = Nothing
 
+whileToken :: ParsecT [Token] st Identity Token
+whileToken = tokenPrim show update_pos get_token where
+  get_token (While p) = Just (While p)
+  get_token _     = Nothing
+
 intToken :: ParsecT [Token] st Identity Token
 intToken = tokenPrim show update_pos get_token where
   get_token (Int p s) = Just (Int p s)

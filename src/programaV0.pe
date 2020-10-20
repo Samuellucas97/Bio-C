@@ -26,7 +26,12 @@ def f1 () : int {
 def f2 (Node[,3,] tree) : void {
 	int x;
     protein x = x;
-    rna x = x;		
+    rna x = x;
+    boolean b = True;
+
+    while (b){
+    	int k;
+    }
 
 }
 
