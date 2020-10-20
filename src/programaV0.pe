@@ -1,10 +1,14 @@
 struct Node {
     int x;
     Node left;
-    Node rigth;
+    Node right;
 }
 struct ABB{
     Node root;
+}
+
+struct ABB2{
+    Node[x,y] root;
 }
 
 const int global1 = 10;
