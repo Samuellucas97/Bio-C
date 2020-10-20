@@ -94,8 +94,7 @@ FIZEMOS ISSO TBM  \/
 FIZEMOS ISSO TBM  /\
                   ||
 ------------
-<function_call> ::= ID "(" <opt_args> ")"
-<opt_args> ::= "" | <args>
+<function_call> ::= ID "(" { "" | <_args> } ")"
 <args> ::= <expr> | <expr> "," <args>
 
 <expr> ::= <un_operator> <expr> | <expr> <bin_operator> <expr> | "(" <expr> ")" | <simple_expr>
