@@ -37,6 +37,16 @@ endBracketToken = tokenPrim show update_pos get_token where
   get_token (EndBracket p) = Just (EndBracket p)
   get_token _   = Nothing
 
+beginSquareBracketToken :: ParsecT [Token] st Identity Token
+beginSquareBracketToken = tokenPrim show update_pos get_token where
+  get_token (BeginSquareBracket p) = Just (BeginSquareBracket p)
+  get_token _     = Nothing
+
+endSquareBracketToken :: ParsecT [Token] st Identity Token
+endSquareBracketToken = tokenPrim show update_pos get_token where
+  get_token (EndSquareBracket p) = Just (EndSquareBracket p)
+  get_token _   = Nothing
+
 semiColonToken :: Parsec [Token] st Token
 semiColonToken = tokenPrim show update_pos get_token where
   get_token (SemiColon p) = Just (SemiColon p)
