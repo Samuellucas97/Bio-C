@@ -20,7 +20,7 @@ int teste = "1";
 
 
 def f1 () : int {
-	
+	f1();
 }
 
 def f2 (Node[,3,] tree) : void {
