@@ -29,13 +29,13 @@ extended_id = (do
         a <- idToken
         b <- square_brackets
         c <- attribute_access
-        return ([a]))
+        return ([a] ++ b ++ c))
 
 attribute_access :: Parsec [Token] st [Token]
 attribute_access = (do 
         a <- dotToken
         b <- extended_id
-        return ([a])) <|> (return[])
+        return ([a] ++ b)) <|> (return[])
 
 -- structs
 
@@ -98,8 +98,8 @@ square_brackets_values = (do
 
 square_brackets_value :: Parsec [Token] st [Token]
 square_brackets_value = (do 
-        b <- idToken
-        return ([b]))
+        b <- expr
+        return (b))
 
 remaining_square_brackets_values :: Parsec [Token] st [Token]
 remaining_square_brackets_values = (do 
@@ -168,7 +168,7 @@ stmts = (do
 
 stmt :: Parsec [Token] st [Token]
 stmt = (do
-        a <- function_call <|> varAssign <|> varDeclaration <|> return_
+        a <- try function_call  <|> varAssign <|> varDeclaration <|> return_
 
         b <- semiColonToken
         return (a ++ [b])) <|> (do
@@ -207,10 +207,11 @@ remaining_stmts = (do
 varDeclaration :: Parsec [Token] st [Token]
 varDeclaration = (do
           a <- extended_type
+          d <- square_brackets
           b <- idToken
           c <- optAssign
           --d <- semiColonToken
-          return (a ++ [b] ++ c))
+          return (a ++ d ++[b] ++ c))
 
 optAssign :: Parsec [Token] st [Token]
 optAssign  = (do 
@@ -239,12 +240,14 @@ array_def = (do
 elements :: Parsec [Token] st [Token]
 elements = (do 
           a <- element
-          return(a)
-          ) <|> (do 
-          a <- element
-          b <- commaToken
-          c <- elements
-          return (a ++ [b] ++ c))
+          b <- remaining_elements
+          return (a ++ b))
+
+remaining_elements :: Parsec [Token] st [Token]
+remaining_elements = (do 
+                  b <- commaToken
+                  a <- elements
+                  return ([b] ++ a)) <|> (return [])
 
 element :: Parsec [Token] st [Token]
 element = (do 
@@ -292,19 +295,19 @@ un_operation  =
 
 simpleExpr :: Parsec [Token] st [Token]
 simpleExpr  = (do 
-        a <- extended_id
+        a <- try function_call <|> extended_id
         return (a)) <|> (do 
         a <- literal
         return (a))
 
 varAssign :: Parsec [Token] st [Token]
-varAssign = do
+varAssign = try (do
           a <- extended_id
           --b <- squareBrackets
           c <- assignToken
           d <- expr
           --e <- semiColonToken
-          return (a ++ [c] ++ d)
+          return (a ++ [c] ++ d))
 
 
 un_operator :: Parsec [Token] st [Token]
