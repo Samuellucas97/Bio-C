@@ -56,11 +56,12 @@ commaToken :: Parsec [Token] st Token
 commaToken = tokenPrim show update_pos get_token where
   get_token (Comma p) = Just (Comma p)
   get_token _         = Nothing
-
+{-
 colonToken :: Parsec [Token] st Token
 colonToken = tokenPrim show update_pos get_token where
   get_token (Colon p) = Just (Colon p)
   get_token _         = Nothing
+-}
 
 dotToken :: Parsec [Token] st Token
 dotToken = tokenPrim show update_pos get_token where
@@ -206,7 +207,7 @@ booleanToken :: ParsecT [Token] st Identity Token
 booleanToken = tokenPrim show update_pos get_token where
   get_token (Boolean p s) = Just (Boolean p s)
   get_token _       = Nothing
-{-
+
 dnaToken :: ParsecT [Token] st Identity Token
 dnaToken = tokenPrim show update_pos get_token where
   get_token (Dna p s) = Just (Dna p s)
@@ -220,7 +221,7 @@ rnaToken = tokenPrim show update_pos get_token where
 proteinToken :: ParsecT [Token] st Identity Token
 proteinToken = tokenPrim show update_pos get_token where
   get_token (Protein p s) = Just (Protein p s)
-  get_token _       = Nothing -}
+  get_token _       = Nothing 
 
 stringToken :: ParsecT [Token] st Identity Token
 stringToken = tokenPrim show update_pos get_token where

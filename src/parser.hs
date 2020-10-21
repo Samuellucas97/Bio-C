@@ -134,7 +134,7 @@ constDeclaration = do
 
 literal :: Parsec [Token] st [Token]
 literal = do 
-        a <- intToken <|> charToken  <|> booleanToken <|> stringToken {- dnaToken <|> dnaToken <|> rnaToken <|> proteinToken <|> -} 
+        a <- intToken <|> charToken  <|> booleanToken <|> stringToken <|> dnaToken <|> rnaToken <|> proteinToken 
         return ([a])
 
 remaining_declaration :: Parsec [Token] st [Token]
