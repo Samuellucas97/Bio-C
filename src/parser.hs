@@ -217,16 +217,50 @@ optAssign  = (do
           a <- assignToken
           b <- expr
           return([a] ++ b)) <|> (return [])
-
+{-
 expr :: Parsec [Token] st [Token]
 expr  = (do 
+        a <- simpleExpr <|> bracketExpr
+        return (a)) <|>  
+        (do 
+        a <- un_operator
+        b <- expr
+        return (a ++ b)) <|>  
+        (do 
         a <- simpleExpr
-        return (a)) <|> (return [])
+        c <- remaining_expr
+        return (a ++ c))
+
+remaining_expr :: Parsec [Token] st [Token]
+remaining_expr  = 
+        (do 
+        a <- simpleExpr
+        b <- bin_operator
+        c <- simpleExpr
+        return (a++ b ++ c))
+-}
+expr :: Parsec [Token] st [Token]
+expr  = try bin_operation <|> un_operation <|> simpleExpr <|> bracketExpr
+
+bin_operation :: Parsec [Token] st [Token]
+bin_operation  =  
+        (do 
+        a <- simpleExpr <|> bracketExpr
+        b <- bin_operator
+        c <- expr
+        return (a ++ b ++ c))
+
+un_operation :: Parsec [Token] st [Token]
+un_operation  =  
+        (do 
+        b <- un_operator
+        c <- expr
+        return (b ++ c))
 
 simpleExpr :: Parsec [Token] st [Token]
 simpleExpr  = (do 
-        a <- idToken
-        return ([a])) <|> (do 
+        a <- extended_id
+        return (a)) <|> (do 
         a <- literal
         return (a))
 
@@ -240,8 +274,15 @@ varAssign = do
           return (a ++ [c] ++ d)
 
 
+un_operator :: Parsec [Token] st [Token]
+un_operator  = (do 
+        a <- notToken <|> minusToken
+        return ([a]))
 
-
+bin_operator :: Parsec [Token] st [Token]
+bin_operator  = (do 
+        a <- minusToken <|> plusToken <|> divToken <|> multToken <|> modToken <|> powToken <|> andToken <|> orToken <|> equalToken <|> differentToken <|> greaterToken <|> lessToken <|> greaterEqualToken <|> lessEqualToken
+        return ([a]))
 
 functions :: Parsec [Token] st [Token]
 functions = (do
@@ -314,14 +355,14 @@ remaining_sb_param_value = (do
 loop :: Parsec [Token] st [Token]
 loop = (do 
         a <- whileToken 
-        b <- commaExpr
+        b <- bracketExpr
         e <- block
         return ([a] ++ b ++ e))
 
 condition :: Parsec [Token] st [Token]
 condition = (do 
         a <- ifToken 
-        b <- commaExpr
+        b <- bracketExpr
         e <- block
         --f <- [] <|> elseBlock <|> elseToken ++ condition
         f <- opt_condition
@@ -333,8 +374,8 @@ opt_condition = (do
         b <- block <|> condition
         return ([a] ++ b)) <|> (return [])
 
-commaExpr :: Parsec [Token] st [Token]
-commaExpr = (do 
+bracketExpr :: Parsec [Token] st [Token]
+bracketExpr = (do 
         b <- beginBracketToken
         c <- expr
         d <- endBracketToken

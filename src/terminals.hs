@@ -107,6 +107,81 @@ constToken = tokenPrim show update_pos get_token where
   get_token (Const p) = Just (Const p)
   get_token _     = Nothing
 
+notToken :: ParsecT [Token] st Identity Token
+notToken = tokenPrim show update_pos get_token where
+  get_token (OpNot p) = Just (OpNot p)
+  get_token _     = Nothing
+
+minusToken :: ParsecT [Token] st Identity Token
+minusToken = tokenPrim show update_pos get_token where
+  get_token (Minus p) = Just (Minus p)
+  get_token _     = Nothing
+
+plusToken :: ParsecT [Token] st Identity Token
+plusToken = tokenPrim show update_pos get_token where
+  get_token (Plus p) = Just (Plus p)
+  get_token _     = Nothing
+
+divToken :: ParsecT [Token] st Identity Token
+divToken = tokenPrim show update_pos get_token where
+  get_token (Div p) = Just (Div p)
+  get_token _     = Nothing
+
+multToken :: ParsecT [Token] st Identity Token
+multToken = tokenPrim show update_pos get_token where
+  get_token (Mult p) = Just (Mult p)
+  get_token _     = Nothing
+
+modToken :: ParsecT [Token] st Identity Token
+modToken = tokenPrim show update_pos get_token where
+  get_token (Mod p) = Just (Mod p)
+  get_token _     = Nothing
+
+andToken :: ParsecT [Token] st Identity Token
+andToken = tokenPrim show update_pos get_token where
+  get_token (OpAnd p) = Just (OpAnd p)
+  get_token _     = Nothing
+
+orToken :: ParsecT [Token] st Identity Token
+orToken = tokenPrim show update_pos get_token where
+  get_token (OpOr p) = Just (OpOr p)
+  get_token _     = Nothing
+
+powToken :: ParsecT [Token] st Identity Token
+powToken = tokenPrim show update_pos get_token where
+  get_token (Pow p) = Just (Pow p)
+  get_token _     = Nothing
+
+equalToken :: ParsecT [Token] st Identity Token
+equalToken = tokenPrim show update_pos get_token where
+  get_token (Equal p) = Just (Equal p)
+  get_token _     = Nothing
+
+differentToken :: ParsecT [Token] st Identity Token
+differentToken = tokenPrim show update_pos get_token where
+  get_token (Different p) = Just (Different p)
+  get_token _     = Nothing
+
+greaterToken :: ParsecT [Token] st Identity Token
+greaterToken = tokenPrim show update_pos get_token where
+  get_token (Greater p) = Just (Greater p)
+  get_token _     = Nothing
+
+lessToken :: ParsecT [Token] st Identity Token
+lessToken = tokenPrim show update_pos get_token where
+  get_token (Less p) = Just (Less p)
+  get_token _     = Nothing
+
+greaterEqualToken :: ParsecT [Token] st Identity Token
+greaterEqualToken = tokenPrim show update_pos get_token where
+  get_token (GreaterOrEqual p) = Just (GreaterOrEqual p)
+  get_token _     = Nothing
+
+lessEqualToken :: ParsecT [Token] st Identity Token
+lessEqualToken = tokenPrim show update_pos get_token where
+  get_token (LessOrEqual p) = Just (LessOrEqual p)
+  get_token _     = Nothing
+
 whileToken :: ParsecT [Token] st Identity Token
 whileToken = tokenPrim show update_pos get_token where
   get_token (While p) = Just (While p)
