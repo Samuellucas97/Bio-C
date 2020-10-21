@@ -213,10 +213,43 @@ varDeclaration = (do
           return (a ++ [b] ++ c))
 
 optAssign :: Parsec [Token] st [Token]
-optAssign  = (do
+optAssign  = (do 
           a <- assignToken
+          b <- array_def <|> expr
+          return ([a] ++ b)
+          ) <|>
+          (do
+          a <- assign_type
           b <- expr
-          return([a] ++ b)) <|> (return [])
+          return(a ++ b)) <|> (return [])
+
+assign_type :: Parsec [Token] st [Token]
+assign_type = (do 
+          a  <- assignToken
+          return([a]))
+
+array_def :: Parsec [Token] st [Token]
+array_def = (do 
+          a <- beginSquareBracketToken
+          b <- elements
+          c <- endSquareBracketToken
+          return ([a] ++ b ++ [c])
+          )
+
+elements :: Parsec [Token] st [Token]
+elements = (do 
+          a <- element
+          return(a)
+          ) <|> (do 
+          a <- element
+          b <- commaToken
+          c <- elements
+          return (a ++ [b] ++ c))
+
+element :: Parsec [Token] st [Token]
+element = (do 
+          a <- array_def <|> expr
+          return (a))
 {-
 expr :: Parsec [Token] st [Token]
 expr  = (do 
