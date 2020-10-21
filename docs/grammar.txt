@@ -55,7 +55,7 @@ OK ATÉ AQUI (sem argc e argv do main)
 
 
 <var_declaration> ::= <extended_type> <square_brackets> ID <opt_assign>
-<opt_assign> ::= "" | <assign_type> <expr> | "=" <array_def>
+<opt_assign> ::= "" | "=" {<array_def> | <expr> }
 
 <var_assign> ::= <extended_id> <assign_type> <expr> | 
 
