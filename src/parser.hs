@@ -110,14 +110,14 @@ remaining_square_brackets_values = (do
 -- declarations
 
 declarations :: Parsec [Token] st [Token]
-declarations = (do
+declarations = try (do
         first <- declaration
         second <- semiColonToken
         next <- remaining_declaration
         return (first ++ [second] ++ next)) <|> (return [])
 
 declaration :: Parsec [Token] st [Token]
-declaration = (do
+declaration = try (do
         a <- varAssign <|> varDeclaration <|> constDeclaration
         return(a))
 
@@ -142,15 +142,14 @@ remaining_declaration = (do a <- declarations
                             return (a)) <|> (return [])
 
 main_ :: Parsec [Token] st [Token]
-main_ = do
+main_ = try (do
+        a <- typeToken
         b <- mainToken
         c <- beginBracketToken
       --  d <- 
         e <- endBracketToken
-        f <- colonToken
-        g <- typeToken
         h <- block
-        return ( [b] ++ [c] ++ [e] ++ [f] ++ [g] ++ h)
+        return ( [a] ++ [b] ++ [c] ++ [e] ++ h))
 
 block :: Parsec [Token] st [Token]
 block = do
@@ -167,7 +166,7 @@ stmts = (do
           return (first ++ next)) <|> (return [])
 
 stmt :: Parsec [Token] st [Token]
-stmt = (do
+stmt = try (do
         a <- try function_call  <|> varAssign <|> varDeclaration <|> return_
 
         b <- semiColonToken
@@ -205,7 +204,7 @@ remaining_stmts = (do
                   return (a)) <|> (return [])
 
 varDeclaration :: Parsec [Token] st [Token]
-varDeclaration = (do
+varDeclaration = try (do
           a <- extended_type
           d <- square_brackets
           b <- idToken
@@ -327,16 +326,14 @@ functions = (do
         return (first ++ next)) <|> (return [])
 
 function :: Parsec [Token] st [Token]
-function = (do
-        a <- defToken
+function = try (do
+        a <- extended_type
         b <- idToken
         c <- beginBracketToken
         d <- params
         e <- endBracketToken
-        f <- colonToken
-        g <- extended_type
         h <- block
-        return([a] ++ [b] ++ [c] ++ d ++ [e] ++ [f] ++ g ++ h))
+        return(a ++ [b] ++ [c] ++ d ++ [e] ++ h))
 
 remaining_function :: Parsec [Token] st [Token]
 remaining_function = (do 

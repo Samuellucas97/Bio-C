@@ -18,12 +18,12 @@ global3 = 111;
 const dna r = "ATUG";
 int teste = "1";
 
-
-def f1 () : int {
+int f1 () {
 	f1();
 }
 
-def f2 (Node[,3,] tree) : void {
+//Node[,3,] tree quer dizer q receberá um vetor de Node com primeira e terceira dimensões desconhecidas
+void f2 (Node[,3,] tree) {
 	int x;
     protein x = x;
     rna x = x;
@@ -35,7 +35,7 @@ def f2 (Node[,3,] tree) : void {
 
 }
 
-def main () : int{
+int main (){
     int x;
     protein x = x;
     rna x = x;
