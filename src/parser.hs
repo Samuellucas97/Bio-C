@@ -6,6 +6,9 @@ import Lexer
 import Text.Parsec
 import Terminals
 
+import System.Environment
+import Data.List
+
 -- program structure
 
 program :: Parsec [Token] st [Token]
@@ -453,9 +456,21 @@ block = do
 
 parser :: [Token] -> Either ParseError [Token]
 parser tokens = runParser program () "Error message" tokens
-
+{-
 main :: IO ()
 main = case parser (getTokens "programaV0.pe") of
             { Left err -> print err; 
               Right ans -> print ans
             }
+
+
+-}
+
+main :: IO ()
+main = do 
+  args <- getArgs
+  case parser (getTokens (head args)) of
+  {
+    Left err -> print err; 
+    Right ans -> print ans
+  }
