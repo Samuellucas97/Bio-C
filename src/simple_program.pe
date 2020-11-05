@@ -1,0 +1,14 @@
+int x(){
+	int k = 8;
+
+	return k;
+}
+
+int main(){
+	
+	int l = x();
+
+	int y;
+
+	return 0;
+}
