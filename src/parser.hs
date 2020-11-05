@@ -12,7 +12,12 @@ import Data.List
 import Control.Monad.IO.Class
 import System.IO.Unsafe
 
+--type var = (id, (type, valor), escopo )
+--type func = (id, [param], return)
+--type new_type = (id, [types])
 type Cell = (Token, Token)
+
+--array = (id, size, type, [(type, value)])
 
 -- program structure
 
