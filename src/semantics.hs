@@ -14,20 +14,20 @@ import Data.Data
 -- 0 : Processando o código
 -- 1 : Executando o código
 
-data Type = Int Int | Float Float deriving Show
+data TypeVal = Int Int | Float Float deriving (Show)--(Show,Eq)
 
-type Variable = ([Type], 	--Tipos e valores
+type Variable = ([TypeVal], 	--Tipos e valores
 				 Bool,		--É const?
 				 String, 	--Escopo
 				 Integer) 	--Contador de chamadas de uma função
 
 type Func = (String,  --ID da função
-	         [Type],  --protocolo (cabeça é o retorno)
+	         [TypeVal],  --protocolo (cabeça é o retorno)
 	         [Token], --Corpo da função
 	         Integer) --Contador de chamadas da função
 
-type Struct = (Token,  --ID do Struct
-			   [Type])	--Atributos
+type Struct = (String,  --ID do Struct
+			   [(TypeVal, String)])	--Atributos
 
 type StateCode = (Integer,  	--flag de execução
 	              [[Token]], 	--contador de programa
@@ -35,7 +35,7 @@ type StateCode = (Integer,  	--flag de execução
 	              [Variable], 	--variáveis
 	              [Struct], 	--structs
 	              [String], 	--pilha de escopos
-	              [Type], 		--pilha de retorno
+	              [TypeVal], 		--pilha de retorno
 	              Integer)		--flags auxiliares
 
 
@@ -54,17 +54,21 @@ enable_execution (a,b,c,d,e,f,g,h) = (1,b,c,d,e,f,g,h)
 disable_execution :: StateCode -> StateCode
 disable_execution (a,b,c,d,e,f,g,h) = (0,b,c,d,e,f,g,h)
 
---string_of_token :: Token -> String
---string_of_token (Var _ c) = c
+string_of_token :: Token -> String
+string_of_token (Var _ c) = c
 
 register_struct :: Token -> StateCode -> StateCode
-register_struct id (a,b,c,d,e,f,g,h) = (a,b,c,d, (id,[]):e, f,g,h)
+register_struct id (a,b,c,d,e,f,g,h) = (a,b,c,d, (string_of_token id,[]):e, f,g,h)
 
-
+add_struct_attribute :: (Token, Token) -> StateCode -> StateCode
+add_struct_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) = 
+	(a,b,c,d, (x, atrs++[(get_type_of t, string_of_token id)]):e, f,g,h)
 
 --enter_function :: StateCode -> StateCode
 
-
+get_type_of :: Token -> TypeVal
+get_type_of (Type _ "int") = (Semantics.Int 0)
+get_type_of (Type _ "float") = (Semantics.Float 0.0)
 
 --get_default_value :: [Token] -> Token
 --get_default_value ((Type p "int"):t) = (Int p 0)

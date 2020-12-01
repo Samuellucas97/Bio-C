@@ -4,6 +4,8 @@ struct ada{
 
 struct bx{
 	int k;
+	float j;
+	int z;
 }
 
 int x = 0;

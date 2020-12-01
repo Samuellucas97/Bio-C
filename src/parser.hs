@@ -66,10 +66,10 @@ struct :: ParsecT [Token] StateCode IO([Token])
 struct = (do
         a <- structToken
         b <- idToken
-        updateState(remaining_struct b)
+        updateState(register_struct b)
+        c <- struct_block
         s <- getState
         liftIO (print s)
-        c <- struct_block
         return([a]++[b]++c))
 
 struct_block :: ParsecT [Token] StateCode IO([Token])
@@ -90,6 +90,7 @@ attribute = (do
         a <- extended_type
         d <- square_brackets
         b <- idToken
+        updateState(add_struct_attribute (head a,b))
         c <- semiColonToken
         return (a ++ d ++ [b] ++ [c]))
 
