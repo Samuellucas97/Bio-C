@@ -1,6 +1,15 @@
+struct ada{
+	int a;
+}
+
+struct bx{
+	int k;
+}
+
+int x = 0;
+
 int x(){
 	int k = 8;
-
 	return k;
 }
 

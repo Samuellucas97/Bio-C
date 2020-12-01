@@ -22,7 +22,7 @@
 
 
 <functions> ::= [ <function> ]
-<function> ::= "def" ID "(" <params> ")" ":" <extended_type> <block>
+<function> ::= <extended_type> ID "(" <params> ")"  <block>
 <params> ::= [ <param> ]
 <param> ::= <extended_type> <sb_param> ID
 <sb_param> ::= "[" <sb_param_values> "]" | ""
