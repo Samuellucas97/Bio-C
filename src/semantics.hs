@@ -14,7 +14,8 @@ import Data.Data
 -- 0 : Processando o código
 -- 1 : Executando o código
 
-data TypeVal = Int Int | Float Float deriving (Show)--(Show,Eq)
+data TypeVal = Int Int | Float Float | String String | Boolean Bool |
+               Char Char | Dna String | Rna String | Protein String deriving (Show)--(Show,Eq)
 
 type Variable = (String,    --Id
 				 [TypeVal], --Tipos e valores
@@ -71,6 +72,12 @@ add_struct_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) =
 get_type_of :: Token -> TypeVal
 get_type_of (Type _ "int") = (Semantics.Int 0)
 get_type_of (Type _ "float") = (Semantics.Float 0.0)
+get_type_of (Type _ "string") = (Semantics.String "")
+get_type_of (Type _ "boolean") = (Semantics.Boolean False)
+get_type_of (Type _ "char") = (Semantics.Char ' ')
+get_type_of (Type _ "dna") = (Semantics.Dna "d:")
+get_type_of (Type _ "rna") = (Semantics.Rna "r:")
+get_type_of (Type _ "protein") = (Semantics.Protein "p:")
 
 {-
 tokens_to_type  :: [Token] -> [TypeVal] -> [TypeVal]
