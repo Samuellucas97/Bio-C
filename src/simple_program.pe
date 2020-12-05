@@ -8,11 +8,15 @@ struct bx{
 	int z;
 }
 
-int x = 0;
+int k = 0;
 
-int x(){
+int x(int p){
 	int k = 8;
 	return k;
+}
+
+int y(float o, int z, int r){
+	return 0;
 }
 
 int main(){

@@ -322,6 +322,8 @@ bin_operator  = (do
 functions :: ParsecT [Token] StateCode IO([Token])
 functions = (do
         first <- function
+        s <- getState
+        liftIO (print s)
         next <- remaining_function
         return (first ++ next)) <|> (return [])
 
@@ -329,10 +331,13 @@ function :: ParsecT [Token] StateCode IO([Token])
 function = try (do
         a <- extended_type
         b <- idToken
+        updateState(register_function (head a, b))
         c <- beginBracketToken
         d <- params
         e <- endBracketToken
+        w <- getInput
         h <- block
+        updateState(add_function_block h)
         return(a ++ [b] ++ [c] ++ d ++ [e] ++ h))
 
 remaining_function :: ParsecT [Token] StateCode IO([Token])
@@ -352,6 +357,7 @@ param = (do
         a <- extended_type
         b <- sb_param
         c <- idToken
+        updateState(add_function_param (head a, c))
         return(a ++ b ++ [c]))
 
 remaining_param :: ParsecT [Token] StateCode IO([Token])
