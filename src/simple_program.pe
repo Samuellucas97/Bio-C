@@ -11,7 +11,7 @@ struct bx{
 int k = 0;
 
 int x(int p){
-	int k = 8;
+	int var1 = 8;
 	return k;
 }
 
@@ -21,7 +21,9 @@ int y(float o, int z, int r){
 
 int main(){
 	
-	int l = x();
+	int l = y();
+
+	x();
 
 	int y;
 

@@ -31,6 +31,8 @@ program = do
         c <- functions
         updateState(enable_execution)
         d <- main_
+        --k <- getState
+        --liftIO(print k)
         eof
         return (a++b++c++d)
 
@@ -68,8 +70,8 @@ struct = (do
         b <- idToken
         updateState(register_struct b)
         c <- struct_block
-        s <- getState
-        liftIO (print s)
+        --s <- getState
+        --liftIO (print s)
         return([a]++[b]++c))
 
 struct_block :: ParsecT [Token] StateCode IO([Token])
@@ -189,10 +191,11 @@ stmts = (do
 stmt :: ParsecT [Token] StateCode IO([Token])
 stmt = try (do
         a <- try function_call  <|> varAssign <|> varDeclaration <|> return_
-
+        liftIO(print a)
         b <- semiColonToken
         return (a ++ [b])) <|> (do
         a <- loop <|> condition
+
         return (a))
 
 function_call :: ParsecT [Token] StateCode IO([Token])
@@ -201,6 +204,15 @@ function_call = (do
         b <- beginBracketToken
         c <- opt_args
         d <- endBracketToken
+        --updateState(enter_in_function a)        
+        k <- getState
+        c_state <- getInput
+        updateState(add_current_state c_state)
+        --func_block <- 
+        setInput(get_function_block a k)
+        l <- block
+        setInput c_state
+
         return ([a] ++ [b] ++ c ++ [d])
         )
 
@@ -275,7 +287,7 @@ element = (do
           return (a))
 
 expr :: ParsecT [Token] StateCode IO([Token])
-expr  = try bin_operation <|> un_operation <|> simpleExpr <|> bracketExpr
+expr  = try simpleExpr <|> bin_operation <|> un_operation <|>  bracketExpr
 
 bin_operation :: ParsecT [Token] StateCode IO([Token])
 bin_operation  =  
@@ -322,8 +334,8 @@ bin_operator  = (do
 functions :: ParsecT [Token] StateCode IO([Token])
 functions = (do
         first <- function
-        s <- getState
-        liftIO (print s)
+        --s <- getState
+        --liftIO (print s)
         next <- remaining_function
         return (first ++ next)) <|> (return [])
 
@@ -335,7 +347,7 @@ function = try (do
         c <- beginBracketToken
         d <- params
         e <- endBracketToken
-        w <- getInput
+        --w <- getInput
         h <- block
         updateState(add_function_block h)
         return(a ++ [b] ++ [c] ++ d ++ [e] ++ h))
@@ -436,5 +448,5 @@ parser tokens = runParserT program (0,[],[],[],[],[],[],0) "Error message" token
 main :: IO ()
 main = case unsafePerformIO (parser (getTokens "simple_program.pe")) of
             { Left err -> print err; 
-              Right ans -> print ans
+              Right ans -> print "ok"--ans
             }

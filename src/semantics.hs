@@ -109,6 +109,50 @@ add_function_block x (a,b,c,d,e,f,g,h) =
 update_fuction_block :: [Token] -> [Func] -> [Func]
 update_fuction_block block ((a,b,_,d):x) = (a,b,block,d):x
 
+
+get_function_block :: Token -> StateCode -> [Token]
+get_function_block id (_,_,c,_,_,_,_,_) = 
+	get_block_of_function(search_function (string_of_token id) c)
+
+--INTERNAL
+search_function :: String -> [Func] -> Func
+search_function _ [] = error "function not found"
+search_function id ((x,a,b,c):t) = 
+	if (id == x) then (id,a,b,c)
+	else search_function id t
+
+--INTERNAL
+get_block_of_function :: Func -> [Token]
+get_block_of_function (_,_,b,_) = b
+
+
+add_current_state :: [Token] -> StateCode -> StateCode
+add_current_state x (a,b,c,d,e,f,g,h) = (a,x:b,c,d,e,f,g,h)
+
+remove_current_state :: StateCode -> StateCode
+remove_current_state (a,(k:t),c,d,e,f,g,h) = (a,t,c,d,e,f,g,h)
+
+is_executing :: StateCode -> Integer
+isexecuting (i,_,_,_,_,_,_,_) = i
+
+{-
+enter_in_function :: Token -> StateCode -> StateCode
+enter_in_function id (a,b,c,d,e,f,g,h) = (do
+	x <- 2
+	return (a,b,c,d,e,f,g,h)
+	)
+
+
+
+
+-}
+
+
+
+
+
+
+
 --get_default_value :: [Token] -> Token
 --get_default_value ((Type p "int"):t) = (Int p 0)
 
