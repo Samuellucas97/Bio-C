@@ -155,7 +155,8 @@ constDeclaration = do
 
 literal :: ParsecT [Token] StateCode IO([Token])
 literal = do 
-        a <- intToken <|> charToken  <|> booleanToken <|> stringToken <|> dnaToken <|> rnaToken <|> proteinToken 
+        a <- intToken <|> floatToken <|> charToken  <|> booleanToken <|> stringToken <|> dnaToken <|> rnaToken <|> proteinToken 
+
         return ([a])
 
 remaining_declaration :: ParsecT [Token] StateCode IO([Token])
@@ -231,7 +232,6 @@ varDeclaration = try (do
           b <- idToken
           c <- optAssign
           s <- getState
-          liftIO(print a)
           liftIO(print "c")
           liftIO(print c)
           if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
@@ -241,6 +241,8 @@ varDeclaration = try (do
 get_type :: [Token] -> StateCode -> Token
 get_type [(Type p1 id1)] _ = (Type p1 id1)
 get_type [_,(Lexer.Int a b)] _ = (Lexer.Int a b)
+get_type [_,(Lexer.Boolean a b)] _ = (Lexer.Boolean a b)
+get_type [_,(Lexer.Float a b)] _ = (Lexer.Float a b)
 get_type (_:((Lexer.Var a b):t)) s = (get_function_type b s)
 get_type _ _ = error "type not found"
 
@@ -260,7 +262,6 @@ optAssign :: ParsecT [Token] StateCode IO([Token])
 optAssign  = (do 
           a <- assignToken
           b <- array_def <|> expr
-
           return ([a] ++ b)
           ) <|>
           (do
@@ -305,30 +306,77 @@ bin_operation :: ParsecT [Token] StateCode IO([Token])
 bin_operation  =  
         (do 
         a <- simpleExpr <|> bracketExpr
-        b <- bin_operator
-        c <- expr
+        result <- eval_remaining_bin a
+        return (result)
+        --b <- bin_operator
+        --c <- expr
         --if (get_type a == (Var _ "int")) then eval_remaining_int a b c 
           --else error "TESTE")
           --else if 
-        return (a ++ b ++ c))
+        --return (a ++ b ++ c))
+        )
 
-eval_remaining_int :: Token -> ParsecT [Token] StateCode IO(Token)
-eval_remaining_int n1 = do
-                      op <- plusToken
-                      n2 <- intToken
-                      result <- eval_remaining_int (eval n1 op n2)
+eval_remaining_bin :: [Token] -> ParsecT [Token] StateCode IO([Token])
+eval_remaining_bin n1 = do
+                      op <- bin_operator
+                      n2 <- expr
+                      liftIO(print n2)
+                      result <- eval_remaining_bin (eval_bin n1 op n2)
+                      --liftIO(print result)
                       return (result) 
                     <|> return (n1)                              
 
-eval :: Token -> Token -> Token -> Token
-eval (Lexer.Int p x) plusToken (Lexer.Int _ y) = Lexer.Int p (x + y)
+eval_bin :: [Token] -> [Token] -> [Token] -> [Token]
+eval_bin [(Lexer.Int p x)] [(Plus p1)] [(Lexer.Int _ y)] = [Lexer.Int p (x + y)]
+eval_bin [(Lexer.Int p x)] [(Minus p1)] [(Lexer.Int _ y)] = [Lexer.Int p (x - y)]
+eval_bin [(Lexer.Int p x)] [(Mult p1)] [(Lexer.Int _ y)] = [Lexer.Int p (x * y)]
+eval_bin [(Lexer.Int p x)] [(Mod p1)] [(Lexer.Int _ y)] = [Lexer.Int p (mod x y)]
+eval_bin [(Lexer.Int p x)] [(Div p1)] [(Lexer.Int _ y)] = [Lexer.Int p (div x y)]
+eval_bin [(Lexer.Int p x)] [(Equal p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.Int p x)] [(Different p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x /= y)]
+eval_bin [(Lexer.Int p x)] [(GreaterOrEqual p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x >= y)] 
+eval_bin [(Lexer.Int p x)] [(LessOrEqual p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x <= y)]
+eval_bin [(Lexer.Int p x)] [(Greater p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x > y)] 
+eval_bin [(Lexer.Int p x)] [(Less p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x < y)]
+eval_bin [(Lexer.Float p x)] [(Plus p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x + y)]
+eval_bin [(Lexer.Float p x)] [(Minus p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x - y)]
+eval_bin [(Lexer.Float p x)] [(Mult p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x * y)]
+eval_bin [(Lexer.Float p x)] [(Div p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x / y)]
+eval_bin [(Lexer.Float p x)] [(Plus p1)] [(Lexer.Int _ y)] = [Lexer.Float p (x + fromIntegral y)] -- QUESTÃO 1 HACK
+eval_bin [(Lexer.Float p x)] [(Different p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x /= y)]
+eval_bin [(Lexer.Float p x)] [(Equal p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.Float p x)] [(GreaterOrEqual p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x >= y)] 
+eval_bin [(Lexer.Float p x)] [(LessOrEqual p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x <= y)]
+eval_bin [(Lexer.Float p x)] [(Greater p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x > y)] 
+eval_bin [(Lexer.Float p x)] [(Less p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x < y)]
+eval_bin [(Lexer.Boolean p x)] [(Different p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x /= y)]
+eval_bin [(Lexer.Boolean p x)] [(Equal p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x == y)]
+
 
 un_operation :: ParsecT [Token] StateCode IO([Token])
 un_operation  =  
         (do 
         b <- un_operator
-        c <- expr
-        return (b ++ c))
+        --c <- expr
+        result <- (eval_remaining_un b)
+        return ([result]))
+        --return (b ++ c))
+eval_un :: Token -> [Token] -> Token
+eval_un (Minus p1) [(Lexer.Int p y)] = (Lexer.Int p (-y))
+eval_un (OpNot p1) [(Lexer.Boolean p y)] = (Lexer.Boolean p (not y))
+eval_un (Minus p1) [(Lexer.Boolean p y)] = error ("Operador inválido para boolean")
+eval_un (OpNot p1) [(Lexer.Int p y)] = error ("Operador inválido para inteiros")
+
+eval_remaining_un :: Token -> ParsecT [Token] StateCode IO(Token)
+eval_remaining_un n1 = try (do
+                      c <- expr
+                      result <- eval_remaining_un (eval_un n1 c)
+                      return(result))
+                    <|>(do
+                      c <- expr
+                      result <- eval_remaining_un (eval_un n1 c)
+                      return(result))
+                    <|> return (n1) 
 
 simpleExpr :: ParsecT [Token] StateCode IO([Token])
 simpleExpr  = (do 
@@ -347,10 +395,10 @@ varAssign = try (do
           return (a ++ [c] ++ d))
 
 
-un_operator :: ParsecT [Token] StateCode IO([Token])
+un_operator :: ParsecT [Token] StateCode IO(Token)
 un_operator  = (do 
         a <- notToken <|> minusToken
-        return ([a]))
+        return (a))
 
 bin_operator :: ParsecT [Token] StateCode IO([Token])
 bin_operator  = (do 

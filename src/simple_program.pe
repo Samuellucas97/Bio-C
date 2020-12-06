@@ -19,7 +19,12 @@ int main(){
 	
 	int l = x();
 
-	int l = 1+1;
+	int l1 = -25;
+	//int l2 = 2*---25%4;
+	
+	float l3 = 2.0+4;
+
+	boolean teste = 2 <= 1;
 
 	int y;
 
