@@ -15,7 +15,7 @@ import Data.Data
 -- 1 : Executando o código
 
 data TypeVal = Int Int | Float Float | String String | Boolean Bool |
-               Char Char | Dna String | Rna String | Protein String deriving (Show)--(Show,Eq)
+               Char Char | Dna String | Rna String | Protein String deriving (Show, Eq)--(Show,Eq)
 
 type Variable = (String,    --Id
 				 [TypeVal], --Tipos e valores
@@ -67,6 +67,13 @@ add_struct_attribute :: (Token, Token) -> StateCode -> StateCode
 add_struct_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) = 
 	(a,b,c,d, (x, atrs++[(get_type_of t, string_of_token id)]):e, f,g,h)
 
+register_variable :: Token -> StateCode -> StateCode
+register_variable id (a,b,c,d,e,f,g,h) = 
+    (a,b,c,d,e,f,g,h)
+
+add_variable_attribute :: (Token, Token) -> StateCode -> StateCode
+add_variable_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) = 
+    (a,b,c,d, (x, atrs++[(get_type_of t, string_of_token id)]):e, f,g,h)
 --enter_function :: StateCode -> StateCode
 
 get_type_of :: Token -> TypeVal
@@ -93,6 +100,12 @@ create_function :: (Token, Token) -> Func
 create_function (r,id) = 
 	(string_of_token id, [(get_type_of r,"rfunc")],[],0)
 
+get_function_type :: String -> StateCode -> Token
+get_function_type id1 (a,b,(id2,(((Semantics.Int t2),s):_),_,_):tail,d,e,f,g,h) = if(id1 == id2) then (Lexer.Int (AlexPn 0 0 0) t2)
+                                                else get_function_type id1 (a,b,tail,d,e,f,g,h)
+get_function_type id1 (a,b,(id2,(((Semantics.String t2),s):_),_,_):tail,d,e,f,g,h) = if(id1 == id2) then (Lexer.String (AlexPn 0 0 0) t2)
+                                                else get_function_type id1 (a,b,tail,d,e,f,g,h)
+get_function_type _ (a,b,[],d,e,f,g,h) = error "variable not found"
 
 add_function_param :: (Token, Token) -> StateCode -> StateCode
 add_function_param x (a,b,c,d,e,f,g,h) = 
