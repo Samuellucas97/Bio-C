@@ -230,13 +230,37 @@ varDeclaration = try (do
           d <- square_brackets
           b <- idToken
           c <- optAssign
-          --d <- semiColonToken
-          return (a ++ d ++[b] ++ c))
+          s <- getState
+          liftIO(print a)
+          liftIO(print "c")
+          liftIO(print c)
+          if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
+            else         --d <- semiColonToken
+              return (a ++ d ++[b] ++ c))
+
+get_type :: [Token] -> StateCode -> Token
+get_type [(Type p1 id1)] _ = (Type p1 id1)
+get_type [_,(Lexer.Int a b)] _ = (Lexer.Int a b)
+get_type (_:((Lexer.Var a b):t)) s = (get_function_type b s)
+get_type _ _ = error "type not found"
+
+compatible :: Token -> Token -> Bool
+compatible (Type _ "int") (Lexer.Int _ _) = True
+compatible (Type _ "float") (Lexer.Float _ _) = True
+compatible (Type _ "boolean") (Lexer.Boolean _ _) = True
+compatible (Type _ "string") (Lexer.String _ _) = True
+compatible (Type _ "char") (Lexer.Char _ _) = True
+compatible (Type _ "dna") (Lexer.Dna _ _) = True
+compatible (Type _ "rna") (Lexer.Rna _ _) = True
+compatible (Type _ "protein") (Lexer.Protein _ _) = True
+compatible _ _ = False
+
 
 optAssign :: ParsecT [Token] StateCode IO([Token])
 optAssign  = (do 
           a <- assignToken
           b <- array_def <|> expr
+
           return ([a] ++ b)
           ) <|>
           (do
@@ -283,7 +307,21 @@ bin_operation  =
         a <- simpleExpr <|> bracketExpr
         b <- bin_operator
         c <- expr
+        --if (get_type a == (Var _ "int")) then eval_remaining_int a b c 
+          --else error "TESTE")
+          --else if 
         return (a ++ b ++ c))
+
+eval_remaining_int :: Token -> ParsecT [Token] StateCode IO(Token)
+eval_remaining_int n1 = do
+                      op <- plusToken
+                      n2 <- intToken
+                      result <- eval_remaining_int (eval n1 op n2)
+                      return (result) 
+                    <|> return (n1)                              
+
+eval :: Token -> Token -> Token -> Token
+eval (Lexer.Int p x) plusToken (Lexer.Int _ y) = Lexer.Int p (x + y)
 
 un_operation :: ParsecT [Token] StateCode IO([Token])
 un_operation  =  
