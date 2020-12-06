@@ -230,25 +230,31 @@ varDeclaration = try (do
           a <- extended_type
           d <- square_brackets
           b <- idToken
+          updateState(register_variable (head a) b)
           c <- optAssign
           s <- getState
-          liftIO(print "c")
-          liftIO(print c)
           if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
             else         --d <- semiColonToken
-              return (a ++ d ++[b] ++ c))
+              if(c == []) then do
+                return (a ++ d ++[b] ++ c)
+              else
+                do
+                  updateState(update_variable_value [b] [(get_type c s)])
+                  return (a ++ d ++[b] ++ c))
 
 get_type :: [Token] -> StateCode -> Token
 get_type [(Type p1 id1)] _ = (Type p1 id1)
 get_type [_,(Lexer.Int a b)] _ = (Lexer.Int a b)
 get_type [_,(Lexer.Boolean a b)] _ = (Lexer.Boolean a b)
 get_type [_,(Lexer.Float a b)] _ = (Lexer.Float a b)
+get_type [_,(Lexer.String a b)] _ = (Lexer.String a b)
 get_type (_:((Lexer.Var a b):t)) s = (get_function_type b s)
 get_type _ _ = error "type not found"
 
 compatible :: Token -> Token -> Bool
 compatible (Type _ "int") (Lexer.Int _ _) = True
 compatible (Type _ "float") (Lexer.Float _ _) = True
+compatible (Type _ "float") (Lexer.Int _ _) = True
 compatible (Type _ "boolean") (Lexer.Boolean _ _) = True
 compatible (Type _ "string") (Lexer.String _ _) = True
 compatible (Type _ "char") (Lexer.Char _ _) = True
@@ -300,31 +306,49 @@ element = (do
           return (a))
 
 expr :: ParsecT [Token] StateCode IO([Token])
-expr  = try bin_operation <|> un_operation <|> simpleExpr <|> bracketExpr
+expr  = try bin_operation <|> un_operation  <|> simpleExpr <|> bracketExpr
 
 bin_operation :: ParsecT [Token] StateCode IO([Token])
 bin_operation  =  
         (do 
         a <- simpleExpr <|> bracketExpr
         result <- eval_remaining_bin a
-        return (result)
+        return (result))
         --b <- bin_operator
         --c <- expr
         --if (get_type a == (Var _ "int")) then eval_remaining_int a b c 
           --else error "TESTE")
           --else if 
         --return (a ++ b ++ c))
-        )
 
 eval_remaining_bin :: [Token] -> ParsecT [Token] StateCode IO([Token])
-eval_remaining_bin n1 = do
-                      op <- bin_operator
-                      n2 <- expr
-                      liftIO(print n2)
-                      result <- eval_remaining_bin (eval_bin n1 op n2)
+eval_remaining_bin n1 = try (do
+                      op <- multToken <|> divToken
+                      n2 <- literal
+                      result <- eval_remaining_bin (eval_bin n1 [op] n2)
                       --liftIO(print result)
-                      return (result) 
-                    <|> return (n1)                              
+                      return (result) )
+                    <|>(do
+                      op <- multToken <|> divToken
+                      n2 <- idToken
+                      s <- getState
+                      result <- eval_remaining_bin (eval_bin n1 [op] (get_variable_value [n2] s))
+                      --liftIO(print result)
+                      return (result) )
+                    <|>(do
+                      op <- minusToken
+                      n2 <- idToken
+                      s <- getState
+                      result <- eval_remaining_bin (eval_bin n1 [op] (get_variable_value [n2] s))
+                      --liftIO(print result)
+                      return (result) )
+                    <|>(do
+                                          op <- bin_operator
+                                          n2 <- expr
+                                          result <- eval_remaining_bin (eval_bin n1 op n2)
+                                          --liftIO(print result)
+                                          return (result) )
+                    <|> (return (n1))       
 
 eval_bin :: [Token] -> [Token] -> [Token] -> [Token]
 eval_bin [(Lexer.Int p x)] [(Plus p1)] [(Lexer.Int _ y)] = [Lexer.Int p (x + y)]
@@ -343,6 +367,7 @@ eval_bin [(Lexer.Float p x)] [(Minus p1)] [(Lexer.Float _ y)] = [Lexer.Float p (
 eval_bin [(Lexer.Float p x)] [(Mult p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x * y)]
 eval_bin [(Lexer.Float p x)] [(Div p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x / y)]
 eval_bin [(Lexer.Float p x)] [(Plus p1)] [(Lexer.Int _ y)] = [Lexer.Float p (x + fromIntegral y)] -- QUESTÃO 1 HACK
+eval_bin [(Lexer.Int p x)] [(Plus p1)] [(Lexer.Float _ y)] = [Lexer.Float p (y + fromIntegral x)] 
 eval_bin [(Lexer.Float p x)] [(Different p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x /= y)]
 eval_bin [(Lexer.Float p x)] [(Equal p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x == y)]
 eval_bin [(Lexer.Float p x)] [(GreaterOrEqual p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x >= y)] 
@@ -372,18 +397,18 @@ eval_remaining_un n1 = try (do
                       c <- expr
                       result <- eval_remaining_un (eval_un n1 c)
                       return(result))
-                    <|>(do
-                      c <- expr
-                      result <- eval_remaining_un (eval_un n1 c)
-                      return(result))
-                    <|> return (n1) 
+                    <|>return (n1) 
 
 simpleExpr :: ParsecT [Token] StateCode IO([Token])
-simpleExpr  = (do 
-        a <- try function_call <|> extended_id
+simpleExpr  = try (do 
+        a <- try function_call
         return (a)) <|> (do 
-        a <- literal
-        return (a))
+        a <- try literal
+        return (a)) <|> (do 
+        a <- try extended_id
+        s <- getState
+        return (get_variable_value a s))
+        --return (a))
 
 varAssign :: ParsecT [Token] StateCode IO([Token])
 varAssign = try (do

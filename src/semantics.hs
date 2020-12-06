@@ -18,7 +18,7 @@ data TypeVal = Int Int | Float Float | String String | Boolean Bool |
                Char Char | Dna String | Rna String | Protein String deriving (Show, Eq)--(Show,Eq)
 
 type Variable = (String,    --Id
-				 [TypeVal], --Tipos e valores
+                 [TypeVal], --Tipos e valores
 				 Bool,		--É const?
 				 String, 	--Escopo
 				 String,    --Referência
@@ -67,20 +67,44 @@ add_struct_attribute :: (Token, Token) -> StateCode -> StateCode
 add_struct_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) = 
 	(a,b,c,d, (x, atrs++[(get_type_of t, string_of_token id)]):e, f,g,h)
 
-register_variable :: Token -> StateCode -> StateCode
-register_variable id (a,b,c,d,e,f,g,h) = 
-    (a,b,c,d,e,f,g,h)
+register_variable :: Token -> Token -> StateCode -> StateCode
+register_variable t id (a,b,c,d,e,f,g,h) = 
+    (a,b,c,((get_variable_from_type_id t id):d),e,f,g,h)
 
-add_variable_attribute :: (Token, Token) -> StateCode -> StateCode
-add_variable_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) = 
-    (a,b,c,d, (x, atrs++[(get_type_of t, string_of_token id)]):e, f,g,h)
+get_variable_from_type_id :: Token -> Token -> Variable
+get_variable_from_type_id (Type p t) (Var p1 id) = (id,[get_type_of (Type p t)], False,"","",0)
 --enter_function :: StateCode -> StateCode
+
+get_variable_value :: [Token] -> StateCode-> [Token]
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Int t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Int (AlexPn 0 0 0) t2)]
+                    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Float (AlexPn 0 0 0) t2)]
+                    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Boolean t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Boolean (AlexPn 0 0 0) t2)]
+                    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error "variable not found"
+
+update_variable_value :: [Token] -> [Token] -> StateCode -> StateCode
+update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
+                            if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Int p value)],co,es,ref,cont)]++d),e,f,g,h)
+                            else (a,b,c,d,e,f,g,h)
+update_variable_value [(Var p1 id)] [(Lexer.Float p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
+                            if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Float p value)],co,es,ref,cont)]++d),e,f,g,h)
+                            else (a,b,c,d,e,f,g,h)
+update_variable_value [(Var p1 id)] [(Lexer.Boolean p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
+                            if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Boolean p value)],co,es,ref,cont)]++d),e,f,g,h)
+                            else (a,b,c,d,e,f,g,h) 
+update_variable_value _ _ (a,b,c,[],e,f,g,h) = error "variable not found"
 
 get_type_of :: Token -> TypeVal
 get_type_of (Type _ "int") = (Semantics.Int 0)
+get_type_of (Lexer.Int _ value) = (Semantics.Int value)
 get_type_of (Type _ "float") = (Semantics.Float 0.0)
+get_type_of (Lexer.Float _ value) = (Semantics.Float value)
 get_type_of (Type _ "string") = (Semantics.String "")
+get_type_of (Lexer.String _ value) = (Semantics.String value)
 get_type_of (Type _ "boolean") = (Semantics.Boolean False)
+get_type_of (Lexer.Boolean _ value) = (Semantics.Boolean value)
 get_type_of (Type _ "char") = (Semantics.Char ' ')
 get_type_of (Type _ "dna") = (Semantics.Dna "d:")
 get_type_of (Type _ "rna") = (Semantics.Rna "r:")
