@@ -21,9 +21,9 @@ int y(float o, int z, int r){
 
 int main(){
 	
-	int l = y();
+	int l = x();
 
-	x();
+	y();
 
 	int y;
 

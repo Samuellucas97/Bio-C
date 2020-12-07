@@ -133,7 +133,7 @@ remove_current_state :: StateCode -> StateCode
 remove_current_state (a,(k:t),c,d,e,f,g,h) = (a,t,c,d,e,f,g,h)
 
 is_executing :: StateCode -> Integer
-isexecuting (i,_,_,_,_,_,_,_) = i
+is_executing (i,_,_,_,_,_,_,_) = i
 
 {-
 enter_in_function :: Token -> StateCode -> StateCode

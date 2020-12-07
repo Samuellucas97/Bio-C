@@ -204,16 +204,18 @@ function_call = (do
         b <- beginBracketToken
         c <- opt_args
         d <- endBracketToken
-        --updateState(enter_in_function a)        
+        --updateState(enter_in_function a)
         k <- getState
-        c_state <- getInput
-        updateState(add_current_state c_state)
-        --func_block <- 
-        setInput(get_function_block a k)
-        l <- block
-        setInput c_state
-
-        return ([a] ++ [b] ++ c ++ [d])
+        if (is_executing k == 1) then do
+          c_state <- getInput
+          updateState(add_current_state c_state)
+          --func_block <- 
+          setInput(get_function_block a k)
+          l <- block
+          setInput c_state
+          return ([a] ++ [b] ++ c ++ [d])
+        else         
+          return ([a] ++ [b] ++ c ++ [d])
         )
 
 opt_args :: ParsecT [Token] StateCode IO([Token])
