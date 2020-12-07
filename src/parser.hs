@@ -200,19 +200,29 @@ stmt = try (do
 function_call :: ParsecT [Token] StateCode IO([Token])
 function_call = (do
         a <- idToken
+        updateState(add_scope a)
+        --s <- getState
+        --liftIO(print s)
         b <- beginBracketToken
         c <- opt_args
+        --liftIO(print "Print >> ")
+        --liftIO(print c)
         d <- endBracketToken
         --updateState(enter_in_function a)
         k <- getState
         if (is_executing k == 1) then do
-          c_state <- getInput
-          updateState(add_current_state c_state)
-          --func_block <- 
-          setInput(get_function_block a k)
-          l <- block
-          setInput c_state
-          return ([a] ++ [b] ++ c ++ [d])
+          if (is_reserved_function a) then do
+            --liftIO(print(value_of_token( head c)))
+            liftIO(value_of_token(head c))
+            return ([a] ++ [b] ++ c ++ [d])
+          else do
+            c_state <- getInput
+            updateState(add_current_state c_state)
+            --func_block <- 
+            setInput(get_function_block a k)
+            l <- block
+            setInput c_state
+            return ([a] ++ [b] ++ c ++ [d])
         else         
           return ([a] ++ [b] ++ c ++ [d])
         )

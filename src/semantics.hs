@@ -180,3 +180,21 @@ remove_current_state (a,(k:t),c,d,e,f,g,h) = (a,t,c,d,e,f,g,h)
 is_executing :: StateCode -> Integer
 is_executing (i,_,_,_,_,_,_,_) = i
 
+is_reserved_function :: Token -> Bool
+is_reserved_function x = 
+	if (string_of_token x == "print") then True
+	else False
+
+
+add_scope :: Token -> StateCode -> StateCode
+add_scope _ (0,b,c,d,e,y,g,h) = (0,b,c,d,e,y,g,h)
+add_scope id (1,b,c,d,e,y,g,h) = (1,b,c,d,e,(string_of_token id):y,g,h)
+
+--data OutValue = Int | String | Float deriving (show)
+
+value_of_token :: Token -> IO()
+value_of_token (Lexer.Int _ c) = putStrLn(show c)
+value_of_token (Lexer.Float _ c) = putStrLn(show c)
+value_of_token (Lexer.String _ c) = putStrLn(show c)
+value_of_token (Lexer.Boolean _ c) = putStrLn(show c)
+

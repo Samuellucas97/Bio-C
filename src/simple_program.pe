@@ -27,6 +27,12 @@ int main(){
 	
 	float l1 = l*l-y+c;
 
+	int tp = 0;
+	tp = tp + 1;
+
+
+	print(l1);
+
 	//int l2 = c+-25;
 	
 	//int l = x();
@@ -39,6 +45,7 @@ int main(){
 	//y();
 
 	//int y;
+
 
 	return 0;
 }
