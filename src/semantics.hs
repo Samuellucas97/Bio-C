@@ -114,6 +114,14 @@ get_type_of (Type _ "dna") = (Semantics.Dna "d:")
 get_type_of (Type _ "rna") = (Semantics.Rna "r:")
 get_type_of (Type _ "protein") = (Semantics.Protein "p:")
 
+
+get_variable_type :: String -> StateCode -> Token
+get_variable_type id1 (a,b,c,(id2,[(Semantics.Int t2)],_,_,_,_):d,e,f,g,h) = if(id1 == id2) then (Lexer.Int (AlexPn 0 0 0) t2)
+                                                else get_variable_type id1 (a,b,c,d,e,f,g,h)
+get_variable_type id1 (a,b,c,(id2,[(Semantics.Float t2)],_,_,_,_):d,e,f,g,h) = if(id1 == id2) then (Lexer.Float (AlexPn 0 0 0) t2)
+                                                else get_variable_type id1 (a,b,c,d,e,f,g,h)
+get_variable_type _ (a,b,c,[],e,f,g,h) = error "variable not found"
+
 {-
 tokens_to_type  :: [Token] -> [TypeVal] -> [TypeVal]
 tokens_to_type [] x = x

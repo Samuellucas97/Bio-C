@@ -24,8 +24,11 @@ int main(){
 	float l = 3.0;
 	float y = 2.0;
 	int c = 4;
+	c = c + 1;
 	
 	float l1 = l*l-y+c;
+
+	l1 = l1 +8.7;
 
 	//int l2 = c+-25;
 	
