@@ -69,7 +69,7 @@ struct = (do
         updateState(register_struct b)
         c <- struct_block
         s <- getState
-        liftIO (print s)
+        --liftIO (print s)
         return([a]++[b]++c))
 
 struct_block :: ParsecT [Token] StateCode IO([Token])
@@ -230,17 +230,22 @@ varDeclaration = try (do
           a <- extended_type
           d <- square_brackets
           b <- idToken
-          updateState(register_variable (head a) b)
           c <- optAssign
           s <- getState
-          if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
-            else         --d <- semiColonToken
-              if(c == []) then do
-                return (a ++ d ++[b] ++ c)
-              else
-                do
+          --if(is_executing s == 0) then do
+          updateState(register_variable (head a) b)
+          --liftIO(print s)
+          if(is_executing s == 1) then do
+            if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
+              else do         --d <- semiColonToken 
+                if(c == []) then do
+                  return (a ++ d ++[b] ++ c)
+                else do
                   updateState(update_variable_value [b] [(get_type c s)])
-                  return (a ++ d ++[b] ++ c))
+                  return (a ++ d ++[b] ++ c)
+          else
+            do
+              return (a ++ d ++[b] ++ c))
 
 get_type :: [Token] -> StateCode -> Token
 get_type [(Type p1 id1)] _ = (Type p1 id1)
@@ -434,7 +439,7 @@ functions :: ParsecT [Token] StateCode IO([Token])
 functions = (do
         first <- function
         s <- getState
-        liftIO (print s)
+        --liftIO (print s)
         next <- remaining_function
         return (first ++ next)) <|> (return [])
 
@@ -547,5 +552,5 @@ parser tokens = runParserT program (0,[],[],[],[],[],[],0) "Error message" token
 main :: IO ()
 main = case unsafePerformIO (parser (getTokens "simple_program.pe")) of
             { Left err -> print err; 
-              Right ans -> print ans
+              Right ans -> print "ans"
             }

@@ -23,21 +23,14 @@ int main(){
 	
 	float l1 = l*l-y+c;
 
-	boolean b1 = c >= 0;
-
-	boolean b2 = c <= 25;
-
-	//x^2-y+x
-
-
 	int l2 = c+-25;
 	
 	//int l = x();
 	//int l2 = 2*---25%4;
 	
-	//float l3 = 2.0+4;
+	float l3 = 2.0+4;
 
-	//boolean teste = 2 <= 1;
+	boolean teste = 2 <= 1;
 
 	int y;
 

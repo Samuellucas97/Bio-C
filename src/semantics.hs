@@ -147,6 +147,8 @@ add_function_block x (a,b,c,d,e,f,g,h) =
 update_fuction_block :: [Token] -> [Func] -> [Func]
 update_fuction_block block ((a,b,_,d):x) = (a,b,block,d):x
 
+is_executing :: StateCode -> Integer
+is_executing (i,_,_,_,_,_,_,_) = i
 --get_default_value :: [Token] -> Token
 --get_default_value ((Type p "int"):t) = (Int p 0)
 
