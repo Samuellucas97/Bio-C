@@ -273,21 +273,34 @@ varDeclaration = try (do
 get_type :: [Token] -> StateCode -> Token
 get_type [(Type p1 id1)] _ = (Type p1 id1)
 get_type [_,(Lexer.Int a b)] _ = (Lexer.Int a b)
+get_type [(Lexer.Int a b)] _ = (Lexer.Int a b)
 get_type [_,(Lexer.Boolean a b)] _ = (Lexer.Boolean a b)
+get_type [(Lexer.Boolean a b)] _ = (Lexer.Boolean a b)
 get_type [_,(Lexer.Float a b)] _ = (Lexer.Float a b)
+get_type [(Lexer.Float a b)] _ = (Lexer.Float a b)
 get_type [_,(Lexer.String a b)] _ = (Lexer.String a b)
+get_type [(Lexer.String a b)] _ = (Lexer.String a b)
 get_type (_:((Lexer.Var a b):t)) s = (get_function_type b s)
+get_type [(Lexer.Var a b)] s = (get_variable_type b s)
 get_type _ _ = error "type not found"
 
 compatible :: Token -> Token -> Bool
 compatible (Type _ "int") (Lexer.Int _ _) = True
+compatible (Lexer.Int _ _) (Lexer.Int _ _) = True
 compatible (Type _ "float") (Lexer.Float _ _) = True
+compatible (Lexer.Float _ _) (Lexer.Float _ _) = True
 compatible (Type _ "float") (Lexer.Int _ _) = True
+compatible (Lexer.Boolean _ _) (Lexer.Boolean _ _) = True
 compatible (Type _ "boolean") (Lexer.Boolean _ _) = True
+compatible (Lexer.String _ _) (Lexer.String _ _) = True
 compatible (Type _ "string") (Lexer.String _ _) = True
+compatible (Lexer.Char _ _) (Lexer.Char _ _) = True
 compatible (Type _ "char") (Lexer.Char _ _) = True
+compatible (Lexer.Dna _ _) (Lexer.Dna _ _) = True
 compatible (Type _ "dna") (Lexer.Dna _ _) = True
+compatible (Lexer.Rna _ _) (Lexer.Rna _ _) = True
 compatible (Type _ "rna") (Lexer.Rna _ _) = True
+compatible (Lexer.Protein _ _) (Lexer.Protein _ _) = True
 compatible (Type _ "protein") (Lexer.Protein _ _) = True
 compatible _ _ = False
 
@@ -444,8 +457,17 @@ varAssign = try (do
           --b <- squareBrackets
           c <- assignToken
           d <- expr
+          s <- getState
+          if(is_executing s == 1) then do
+            if(not (compatible(get_type a s ) ( get_type d s))) then fail "type amismatch"
+              else do
+                updateState(update_variable_value [head a] d)
+                return (a ++ [c] ++ d)
+          else
+            do
+              return (a ++ [c] ++ d))
           --e <- semiColonToken
-          return (a ++ [c] ++ d))
+          --return (a ++ [c] ++ d))
 
 
 un_operator :: ParsecT [Token] StateCode IO(Token)
