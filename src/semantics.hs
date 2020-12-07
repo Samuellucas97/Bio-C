@@ -15,7 +15,7 @@ import Data.Data
 -- 1 : Executando o código
 
 data TypeVal = Int Int | Float Float | String String | Boolean Bool |
-               Char Char | Dna String | Rna String | Protein String deriving (Show, Eq)--(Show,Eq)
+               Char Char | Dna String | Rna String | Protein String | Array [TypeVal] deriving (Show, Eq)--(Show,Eq)
 
 type Variable = (String,    --Id
                  [TypeVal], --Tipos e valores
@@ -114,7 +114,6 @@ get_type_of (Type _ "dna") = (Semantics.Dna "d:")
 get_type_of (Type _ "rna") = (Semantics.Rna "r:")
 get_type_of (Type _ "protein") = (Semantics.Protein "p:")
 
-
 get_variable_type :: String -> StateCode -> Token
 get_variable_type id1 (a,b,c,(id2,[(Semantics.Int t2)],_,_,_,_):d,e,f,g,h) = if(id1 == id2) then (Lexer.Int (AlexPn 0 0 0) t2)
                                                 else get_variable_type id1 (a,b,c,d,e,f,g,h)
@@ -206,3 +205,6 @@ value_of_token (Lexer.Float _ c) = putStrLn(show c)
 value_of_token (Lexer.String _ c) = putStrLn(show c)
 value_of_token (Lexer.Boolean _ c) = putStrLn(show c)
 
+
+boolean_of_expresison :: Token -> Bool
+boolean_of_expresison (Lexer.Boolean _ c) = c

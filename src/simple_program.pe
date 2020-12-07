@@ -1,22 +1,9 @@
-struct ada{
-	int a;
-}
-
-struct bx{
-	int k;
-	float j;
-	int z;
-}
-
-int x = 0;
-
-int y(){
-	return 0;
-}
 
 int x(){
-	int k = 8;
-	return y();
+	int k = 80;
+
+	print(k);
+	print(k);
 }
 
 int main(){
@@ -29,28 +16,26 @@ int main(){
 	float l1 = l*l-y+c;
 
 
-	int tp = 0;
-	tp = tp + 1;
 
+	int varx = 0;
 
-	print(tp);
+	while (varx < 10){
+		varx = varx + 1;
+		print(varx);
+	}
 
-	l1 = l1 +8.7;
-
-
-	//int l2 = c+-25;
 	
-	//int l = x();
-	//int l2 = 2*---25%4;
-	
-	//float l3 = 2.0+4;
+	if (varx == 5){
+		print("true");
+	} else if (varx == 50) {
+		print("false1");
+	} else {
+		print("false2");
+	}
 
-	//boolean teste = 2 <= 1;
+	x();
 
-	//y();
-
-	//int y;
-
+	print(k);
 
 	return 0;
 }

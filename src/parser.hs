@@ -552,19 +552,53 @@ remaining_sb_param_value = (do
 
 loop :: ParsecT [Token] StateCode IO([Token])
 loop = (do 
+        c_state <- getInput
         a <- whileToken 
-        b <- bracketExpr
-        e <- block
-        return ([a] ++ b ++ e))
+        --b <- bracketExpr
+        b <- beginBracketToken
+        c <- expr
+        d <- endBracketToken
+        exe <- getState
+        if (is_executing exe == 1) then do
+          if (boolean_of_expresison(head c) == True) then do
+            e <- block
+            setInput c_state
+            x <- loop
+            return ([a] ++ [b] ++ c ++ [d] ++ e)
+          else do
+            updateState(disable_execution)
+            e <- block
+            updateState(enable_execution)
+            return ([a] ++ [b] ++ c ++ [d] ++ e)
+        else do
+          e <- block
+          return ([a] ++ [b] ++ c ++ [d] ++ e))
 
 condition :: ParsecT [Token] StateCode IO([Token])
 condition = (do 
         a <- ifToken 
-        b <- bracketExpr
-        e <- block
-        --f <- [] <|> elseBlock <|> elseToken ++ condition
-        f <- opt_condition
-        return ([a] ++ b ++ e ++ f))
+        b <- beginBracketToken
+        c <- expr
+        d <- endBracketToken
+        exe <- getState
+        if (is_executing exe == 1) then do
+          if (boolean_of_expresison(head c) == True) then do
+            e <- block
+            updateState(disable_execution)
+            f <- opt_condition
+            updateState(enable_execution)
+            return ([a] ++ [b] ++ c ++ [d] ++ e ++ f)
+          else do
+            updateState(disable_execution)
+            e <- block
+            updateState(enable_execution)
+            f <- opt_condition
+            return ([a] ++ [b] ++ c ++ [d] ++ e ++ f)
+        else do
+          e <- block
+          --f <- [] <|> elseBlock <|> elseToken ++ condition
+          f <- opt_condition
+          return ([a] ++ [b] ++ c ++ [d] ++ e ++ f))
 
 opt_condition :: ParsecT [Token] StateCode IO([Token])
 opt_condition = (do 
