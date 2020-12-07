@@ -70,11 +70,11 @@ add_struct_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) =
 	(a,b,c,d, (x, atrs++[(get_type_of t, string_of_token id)]):e, f,g,h)
 
 register_variable :: Token -> Token -> StateCode -> StateCode
-register_variable t id (a,b,c,d,e,f,g,h) = 
-    (a,b,c,((get_variable_from_type_id t id):d),e,f,g,h)
+register_variable t id (a,b,c,d,e,f,g,h) = if(f == []) then (a,b,c,((get_variable_from_type_id t id "const"):d),e,f,g,h)
+    else (a,b,c,((get_variable_from_type_id t id (head f)):d),e,f,g,h)
 
-get_variable_from_type_id :: Token -> Token -> Variable
-get_variable_from_type_id (Type p t) (Var p1 id) = (id,[get_type_of (Type p t)], False,"","",0)
+get_variable_from_type_id :: Token -> Token -> String -> Variable
+get_variable_from_type_id (Type p t) (Var p1 id) s = (id,[get_type_of (Type p t)], False,s,"",0)
 --enter_function :: StateCode -> StateCode
 
 
@@ -89,7 +89,11 @@ get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error "variable not found"
 
 update_variable_value :: [Token] -> [Token] -> StateCode -> StateCode
 update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
-                            if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Int p value)],co,es,ref,cont)]++d),e,f,g,h)
+                            if(id == id1) then do
+                                if(f == []) then do error "no scope"
+                                else
+                                    if(es == head f) then (a,b,c,([(id1,[get_type_of (Lexer.Int p value)],co,es,ref,cont)]++d),e,f,g,h)
+                                    else error "variable not in scope"
                             else (a,b,c,d,e,f,g,h)
 update_variable_value [(Var p1 id)] [(Lexer.Float p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
                             if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Float p value)],co,es,ref,cont)]++d),e,f,g,h)
@@ -97,7 +101,10 @@ update_variable_value [(Var p1 id)] [(Lexer.Float p value)] (a,b,c,((id1,tp,co,e
 update_variable_value [(Var p1 id)] [(Lexer.Boolean p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
                             if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Boolean p value)],co,es,ref,cont)]++d),e,f,g,h)
                             else (a,b,c,d,e,f,g,h) 
-update_variable_value _ _ (a,b,c,[],e,f,g,h) = error "variable not found"
+update_variable_value _ _ (a,b,c,[],e,f,g,h) = error "variable not afound"
+
+un_register_variable :: StateCode -> StateCode
+un_register_variable (a,b,c,v:d,e,f,g,h) = (a,b,c,d,e,f,g,h)
 
 
 get_type_of :: Token -> TypeVal
@@ -120,7 +127,7 @@ get_variable_type id1 (a,b,c,(id2,[(Semantics.Int t2)],_,_,_,_):d,e,f,g,h) = if(
                                                 else get_variable_type id1 (a,b,c,d,e,f,g,h)
 get_variable_type id1 (a,b,c,(id2,[(Semantics.Float t2)],_,_,_,_):d,e,f,g,h) = if(id1 == id2) then (Lexer.Float (AlexPn 0 0 0) t2)
                                                 else get_variable_type id1 (a,b,c,d,e,f,g,h)
-get_variable_type _ (a,b,c,[],e,f,g,h) = error "variable not found"
+get_variable_type _ (a,b,c,[],e,f,g,h) = error "variable not bfound"
 
 {-
 tokens_to_type  :: [Token] -> [TypeVal] -> [TypeVal]
@@ -142,7 +149,7 @@ get_function_type id1 (a,b,(id2,(((Semantics.Int t2),s):_),_,_):tail,d,e,f,g,h) 
                                                 else get_function_type id1 (a,b,tail,d,e,f,g,h)
 get_function_type id1 (a,b,(id2,(((Semantics.String t2),s):_),_,_):tail,d,e,f,g,h) = if(id1 == id2) then (Lexer.String (AlexPn 0 0 0) t2)
                                                 else get_function_type id1 (a,b,tail,d,e,f,g,h)
-get_function_type _ (a,b,[],d,e,f,g,h) = error "variable not found"
+get_function_type _ (a,b,[],d,e,f,g,h) = error "variable not cfound"
 
 add_function_param :: (Token, Token) -> StateCode -> StateCode
 add_function_param x (a,b,c,d,e,f,g,h) = 
@@ -196,7 +203,13 @@ is_reserved_function x =
 
 add_scope :: Token -> StateCode -> StateCode
 add_scope _ (0,b,c,d,e,y,g,h) = (0,b,c,d,e,y,g,h)
+add_scope (Main p) (a,b,c,d,e,y,g,h) = (a,b,c,d,e,"main":y,g,h)
 add_scope id (1,b,c,d,e,y,g,h) = (1,b,c,d,e,(string_of_token id):y,g,h)
+
+rm_scope :: StateCode -> StateCode
+rm_scope (a,b,c,d,e,y,g,h) = if (y == ["const"]) then (a,b,c,d,e,y,g,h)
+    else if(y == []) then (a,b,c,d,e,y,g,h)
+        else (a,b,c,d,e,tail y,g,h)
 
 --data OutValue = Int | String | Float deriving (show)
 

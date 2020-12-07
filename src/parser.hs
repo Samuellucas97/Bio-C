@@ -132,6 +132,7 @@ remaining_square_brackets_values = (do
 
 declarations :: ParsecT [Token] StateCode IO([Token])
 declarations = try (do
+        updateState(add_scope (Var (AlexPn 0 0 0) "const"))
         first <- declaration
         second <- semiColonToken
         next <- remaining_declaration
@@ -167,6 +168,10 @@ main_ :: ParsecT [Token] StateCode IO([Token])
 main_ = try (do
         a <- typeToken
         b <- mainToken
+        s <- getState
+        --liftIO(print s)
+        updateState(add_scope b)
+        --liftIO(print s)
         c <- beginBracketToken
       --  d <- 
         e <- endBracketToken
@@ -200,7 +205,6 @@ stmt = try (do
 function_call :: ParsecT [Token] StateCode IO([Token])
 function_call = (do
         a <- idToken
-        updateState(add_scope a)
         --s <- getState
         --liftIO(print s)
         b <- beginBracketToken
@@ -211,8 +215,10 @@ function_call = (do
         --updateState(enter_in_function a)
         k <- getState
         if (is_executing k == 1) then do
+          updateState(add_scope a)
           if (is_reserved_function a) then do
             --liftIO(print(value_of_token( head c)))
+            liftIO(print c)
             liftIO(value_of_token(head c))
             return ([a] ++ [b] ++ c ++ [d])
           else do
@@ -254,20 +260,25 @@ varDeclaration = try (do
           b <- idToken
           c <- optAssign
           s <- getState
-          --liftIO(print c)
-          --if(is_executing s == 0) then do
           updateState(register_variable (head a) b)
-          --liftIO(print s)
+          --if(is_executing s == 0) then do
           if(is_executing s == 1) then do
             if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
               else do         --d <- semiColonToken 
                 if(c == []) then do
                   return (a ++ d ++[b] ++ c)
                 else do
+                  --liftIO(print b)
+                  --liftIO(print s)
                   updateState(update_variable_value [b] [(get_type c s)])
+                  --liftIO(print s)
+                  --liftIO(print (get_type c s))
+                  --liftIO(print s)
                   return (a ++ d ++[b] ++ c)
           else
             do
+              liftIO(print s)
+              --updateState(un_register_variable)
               return (a ++ d ++[b] ++ c))
 
 get_type :: [Token] -> StateCode -> Token
@@ -443,6 +454,9 @@ eval_remaining_un n1 = try (do
 simpleExpr :: ParsecT [Token] StateCode IO([Token])
 simpleExpr  = try (do 
         a <- try function_call
+        --s <- getState
+        --liftIO(print "a")
+        --liftIO(print s)
         return (a)) <|> (do 
         a <- try literal
         return (a)) <|> (do 
@@ -583,6 +597,7 @@ return_ :: ParsecT [Token] StateCode IO([Token])
 return_ = (do 
         a <- returnToken 
         b <- expr
+        updateState(rm_scope)
         return ([a] ++ b))
 
 
