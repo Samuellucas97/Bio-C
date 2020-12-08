@@ -26,6 +26,7 @@ program :: ParsecT [Token] StateCode IO([Token])
 program = do
         a <- structs
         updateState(enable_execution)
+        updateState(add_scope_global)
         b <- declarations
         updateState(disable_execution)
         c <- functions
@@ -167,6 +168,8 @@ main_ :: ParsecT [Token] StateCode IO([Token])
 main_ = try (do
         a <- typeToken
         b <- mainToken
+        updateState(add_scope b)
+        --liftIO(print b)
         c <- beginBracketToken
       --  d <- 
         e <- endBracketToken
@@ -214,16 +217,19 @@ function_call = (do
           if (is_reserved_function a) then do
             --liftIO(print(value_of_token( head c)))
             liftIO(value_of_token(head c))
+            updateState(remove_current_scope)
             return ([a] ++ [b] ++ c ++ [d])
           else do
             c_state <- getInput
-            updateState(add_current_state c_state)
+            --updateState(add_current_state c_state)
             --func_block <- 
             setInput(get_function_block a k)
             l <- block
             setInput c_state
+            updateState(remove_current_scope)
             return ([a] ++ [b] ++ c ++ [d])
-        else         
+        else do
+          --updateState(remove_current_scope)
           return ([a] ++ [b] ++ c ++ [d])
         )
 
@@ -256,19 +262,25 @@ varDeclaration = try (do
           s <- getState
           --liftIO(print c)
           --if(is_executing s == 0) then do
-          updateState(register_variable (head a) b)
+          --updateState(register_variable (head a) b)
+          --liftIO(print b)
           --liftIO(print s)
-          if(is_executing s == 1) then do
-            if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
-              else do         --d <- semiColonToken 
-                if(c == []) then do
-                  return (a ++ d ++[b] ++ c)
-                else do
-                  updateState(update_variable_value [b] [(get_type c s)])
-                  return (a ++ d ++[b] ++ c)
-          else
-            do
-              return (a ++ d ++[b] ++ c))
+          --if(is_executing s == 1) then do
+          updateState(register_variable (head a) b)
+          if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
+            else do         --d <- semiColonToken 
+              if(c == []) then do
+                return (a ++ d ++[b] ++ c)
+              else do
+
+                updateState(update_variable_value [b] [(get_type c s)])
+                return (a ++ d ++[b] ++ c)
+                )
+          --else
+            --do
+              --updateState(register_variable (head a) b)
+              --liftIO(print c)
+              --return (a ++ d ++[b] ++ c))
 
 get_type :: [Token] -> StateCode -> Token
 get_type [(Type p1 id1)] _ = (Type p1 id1)
@@ -461,6 +473,7 @@ varAssign = try (do
           if(is_executing s == 1) then do
             if(not (compatible(get_type a s ) ( get_type d s))) then fail "type amismatch"
               else do
+                --liftIO(print d)
                 updateState(update_variable_value [head a] d)
                 return (a ++ [c] ++ d)
           else

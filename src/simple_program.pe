@@ -1,9 +1,8 @@
-
+int lol = 10;
 int x(){
 	int k = 80;
 
-	print(k);
-	print(k);
+	//print(c);
 }
 
 int main(){
@@ -14,6 +13,7 @@ int main(){
 	c = c + 1;
 	
 	float l1 = l*l-y+c;
+	print(l1);
 
 
 
@@ -34,8 +34,6 @@ int main(){
 	}
 
 	x();
-
-	print(k);
-
+	//print(k);
 	return 0;
 }

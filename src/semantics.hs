@@ -71,16 +71,29 @@ add_struct_attribute (t, id) (a,b,c,d,(x,atrs):e,f,g,h) =
 
 register_variable :: Token -> Token -> StateCode -> StateCode
 register_variable t id (a,b,c,d,e,f,g,h) = 
-    (a,b,c,((get_variable_from_type_id t id):d),e,f,g,h)
+    (a,b,c,((get_variable_from_type_id t id (head f)):d),e,f,g,h)
 
-get_variable_from_type_id :: Token -> Token -> Variable
-get_variable_from_type_id (Type p t) (Var p1 id) = (id,[get_type_of (Type p t)], False,"","",0)
+un_register_variable :: StateCode -> StateCode
+un_register_variable (a,b,c,[],e,f,g,h) = (a,b,c,[],e,f,g,h)
+un_register_variable (a,b,c,d,e,f,g,h) = (a,b,c,tail d,e,f,g,h)
+
+get_variable_from_type_id :: Token -> Token -> String -> Variable
+get_variable_from_type_id (Type p t) (Var p1 id) s = (id,[get_type_of (Type p t)], False,s,"",0)
 --enter_function :: StateCode -> StateCode
 
 
 get_variable_value :: [Token] -> StateCode-> [Token]
-get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Int t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Int (AlexPn 0 0 0) t2)]
-                    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Int t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Int (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Int (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Float (AlexPn 0 0 0) t2)]
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Boolean t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Boolean (AlexPn 0 0 0) t2)]
@@ -89,8 +102,15 @@ get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error "variable not found"
 
 update_variable_value :: [Token] -> [Token] -> StateCode -> StateCode
 update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
-                            if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Int p value)],co,es,ref,cont)]++d),e,f,g,h)
-                            else (a,b,c,d,e,f,g,h)
+                            --if(f /= [] && es == head f) then do
+                        if(id == id1) then do
+                            if(es == head f) then
+                                (a,b,c,([(id1,[get_type_of (Lexer.Int p value)],co,es,ref,cont)]++d),e,f,g,h)
+                            else 
+                                (a,b,c,d,e,f,g,h)
+                                --error("variable not in scope")
+                        else (a,b,c,d,e,f,g,h)
+                            --else error ("variable not in add_scope" ++ show p1)
 update_variable_value [(Var p1 id)] [(Lexer.Float p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
                             if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Float p value)],co,es,ref,cont)]++d),e,f,g,h)
                             else (a,b,c,d,e,f,g,h)
@@ -195,7 +215,16 @@ is_reserved_function x =
 
 add_scope :: Token -> StateCode -> StateCode
 add_scope _ (0,b,c,d,e,y,g,h) = (0,b,c,d,e,y,g,h)
+add_scope (Main _) (a,b,c,d,e,y,g,h) = (a,b,c,d,e,"main":y,g,h)
+add_scope (Var _ s) (a,b,c,d,e,y,g,h) = (a,b,c,d,e,s:y,g,h)
 add_scope id (1,b,c,d,e,y,g,h) = (1,b,c,d,e,(string_of_token id):y,g,h)
+
+add_scope_global :: StateCode -> StateCode
+add_scope_global (a,b,c,d,e,y,g,h) = (a,b,c,d,e,"global":y,g,h)
+
+remove_current_scope :: StateCode -> StateCode
+remove_current_scope (a,b,c,d,e,[],g,h) = (a,b,c,d,e,[],g,h)
+remove_current_scope (a,b,c,d,e,y,g,h) = (a,b,c,d,e,tail y,g,h)
 
 --data OutValue = Int | String | Float deriving (show)
 
