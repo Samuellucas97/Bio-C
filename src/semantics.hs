@@ -9,13 +9,16 @@ import System.IO.Unsafe
 
 import Data.Data
 
+import Data.Array
+
 
 -- Flags de execução
 -- 0 : Processando o código
 -- 1 : Executando o código
 
 data TypeVal = Int Int | Float Float | String String | Boolean Bool |
-               Char Char | Dna String | Rna String | Protein String | Array [TypeVal] deriving (Show, Eq)--(Show,Eq)
+               Char Char | Dna String | Rna String | Protein String | 
+               Array (Array (Int,Int) TypeVal) deriving (Show, Eq)--(Show,Eq)
 
 type Variable = (String,    --Id
                  [TypeVal], --Tipos e valores
@@ -98,6 +101,8 @@ get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,_,_,_):d,e
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Boolean t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Boolean (AlexPn 0 0 0) t2)]
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+--get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Array t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Int (AlexPn 0 0 0) get(t2!(1,1)))]
+--                    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error "variable not found"
 
 update_variable_value :: [Token] -> [Token] -> StateCode -> StateCode
@@ -237,3 +242,23 @@ value_of_token (Lexer.Boolean _ c) = putStrLn(show c)
 
 boolean_of_expresison :: Token -> Bool
 boolean_of_expresison (Lexer.Boolean _ c) = c
+
+register_array :: [Token] -> Token -> [Token] -> StateCode -> StateCode
+register_array [(Type p t)] (Var _ id) dim (a,b,c,d,e,f,g,h) =  
+    (a,b,c,((get_variable_from_type_id_dim (Type p t) id dim (head f)):d),e,f,g,h)
+
+get_variable_from_type_id_dim :: Token -> String -> [Token] -> String -> Variable
+get_variable_from_type_id_dim t id dim s = (id,[get_array_default dim t], False,s,"",0)
+
+get_array_default :: [Token] -> Token -> TypeVal
+get_array_default dim t = list_comp (get_int(head(tail dim))) (get_int(head(tail(tail(tail dim))))) t
+
+get_int :: Token -> Int
+get_int (Lexer.Int p i) = i
+
+list_comp :: Int -> Int -> Token -> TypeVal
+list_comp a b t = (Array (array ((1,1),(a,b)) [((i,j),(get_type_of t)) | i <- [1..a],j <- [1..b] ]))
+
+--update_array_pos_value :: Token -> [Token] -> Token -> StateCode -> StateCode
+--update_array_pos_value (Var _ id) dim ex (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
+--    if(id == id1)

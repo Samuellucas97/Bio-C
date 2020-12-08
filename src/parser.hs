@@ -116,6 +116,7 @@ square_brackets_values :: ParsecT [Token] StateCode IO([Token])
 square_brackets_values = (do
         first <- square_brackets_value
         next <- remaining_square_brackets_values
+        --liftIO(print (first ++ next))
         return (first ++ next))
 
 square_brackets_value :: ParsecT [Token] StateCode IO([Token])
@@ -264,18 +265,24 @@ varDeclaration = try (do
           --if(is_executing s == 0) then do
           --updateState(register_variable (head a) b)
           --liftIO(print b)
-          --liftIO(print s)
+          --liftIO(print d)
           --if(is_executing s == 1) then do
-          updateState(register_variable (head a) b)
-          if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
-            else do         --d <- semiColonToken 
-              if(c == []) then do
-                return (a ++ d ++[b] ++ c)
-              else do
+          if(d == [])then do 
+            updateState(register_variable (head a) b)
+            if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
+              else do         --d <- semiColonToken 
+                if(c == []) then do
+                  return (a ++ d ++[b] ++ c)
+                else do
 
-                updateState(update_variable_value [b] [(get_type c s)])
-                return (a ++ d ++[b] ++ c)
-                )
+                  updateState(update_variable_value [b] [(get_type c s)])
+                  return (a ++ d ++[b] ++ c)
+          else do
+            liftIO(print d)
+            liftIO(print (get_array_default d (head a)))
+            updateState(register_array a b d)
+            return (a ++ d ++[b] ++ c)
+                  )
           --else
             --do
               --updateState(register_variable (head a) b)
@@ -466,7 +473,7 @@ simpleExpr  = try (do
 varAssign :: ParsecT [Token] StateCode IO([Token])
 varAssign = try (do
           a <- extended_id
-          --b <- squareBrackets
+          --b <- square_brackets
           c <- assignToken
           d <- expr
           s <- getState
@@ -478,7 +485,19 @@ varAssign = try (do
                 return (a ++ [c] ++ d)
           else
             do
-              return (a ++ [c] ++ d))
+              return (a ++ [c] ++ d)
+          ) {-<|> (do
+
+          a <- idToken
+          b <- square_brackets
+          c <- assignToken
+          d <- expr
+          s <- getState
+          if(b\=[])then do
+
+          else
+
+          )-}
           --e <- semiColonToken
           --return (a ++ [c] ++ d))
 

@@ -35,5 +35,9 @@ int main(){
 
 	x();
 	//print(k);
+
+	int [4,9] vetor;
+
+	//vetor[1,1] = 2;
 	return 0;
 }
