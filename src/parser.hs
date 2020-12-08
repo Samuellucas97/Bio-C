@@ -33,7 +33,7 @@ program = do
         updateState(enable_execution)
         d <- main_
         k <- getState
-        liftIO(print k)
+        --liftIO(print k)
         eof
         return (a++b++c++d)
 
@@ -667,7 +667,9 @@ parser tokens = runParserT program (0,[],[],[],[],[],[],0) "Error message" token
 
 
 main :: IO ()
-main = case unsafePerformIO (parser (getTokens "simple_program.pe")) of
+main = do
+  args <- getArgs
+  case unsafePerformIO (parser (getTokens (head args))) of
             { Left err -> print err; 
-              Right ans -> print "ans"
+              Right ans -> print "FINISHED"
             }

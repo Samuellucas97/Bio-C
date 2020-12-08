@@ -1,0 +1,43 @@
+int main(){
+	
+	int i1;
+	int i2;
+	int i3;
+	int i4;
+
+	int inp;
+
+	print("Digite seus valores:");
+
+	read(inp);
+	while (inp >= 0){
+		if (inp <= 25){
+			i1 = i1 + 1;
+		} else if (inp <= 50){
+			i2 = i2 + 1;
+
+		} else if (inp <= 75){
+			i3 = i3 + 1;
+
+		} else if (inp <= 100) {
+			i4 = i4 + 1;
+
+		}
+
+		read(inp);
+	}
+
+	print("[0,25]:");
+	print(i1);
+
+	print("[26,50]:");
+	print(i2);
+
+	print("[51,75]:");
+	print(i3);
+
+	print("[76,100]:");
+	print(i4);
+
+	return 0;
+}

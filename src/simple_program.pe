@@ -1,76 +1,13 @@
-int lol = 10;
-int x(){
-	int k = 80;
-
-	//print(c);
-}
-
 int main(){
-
-	int ix = 0;
-	int iy = 0;
-	
-
-	int inp = 0;
-
-	read(inp);
-	while(inp >= 0){
-		
-		
-		if (inp > 10){
-			ix = ix + 1;
-		} else {
-			iy= iy + 1;
-		}
-		read(inp);
-
-	}
-
-	print("I1");
-	print(ix);
-
-	print("I2");
-	print(iy);
-
-
-	int tx = 0;
-	print(tx);
-	read(tx);
-	print("valor de tx");
-	print(tx);
 
 	float l = 3.0;
 	float y = 2.0;
+	
 	int c = 4;
 	c = c + 1;
 	
 	float l1 = l*l-y+c;
 	print(l1);
-
-
-
-	int varx = 0;
-
-	while (varx < 10){
-		varx = varx + 1;
-		print(varx);
-	}
-
-	
-	if (varx == 5){
-		print("true");
-	} else if (varx == 50) {
-		print("false1");
-	} else {
-		print("false2");
-	}
-
-	print(varx);
-
-	x();
-	//print(k);
-
-	
 
 	return 0;
 }
