@@ -210,12 +210,14 @@ is_executing (i,_,_,_,_,_,_,_) = i
 is_reserved_function :: Token -> Bool
 is_reserved_function x = 
 	if (string_of_token x == "print") then True
-	else False
+	else if (string_of_token x == "read")  then True
+		else False
 
 
 add_scope :: Token -> StateCode -> StateCode
 add_scope _ (0,b,c,d,e,y,g,h) = (0,b,c,d,e,y,g,h)
 add_scope (Main _) (a,b,c,d,e,y,g,h) = (a,b,c,d,e,"main":y,g,h)
+add_scope (Var _ "read") (a,b,c,d,e,y,g,h) = (a,b,c,d,e,"main":y,g,h)
 add_scope (Var _ s) (a,b,c,d,e,y,g,h) = (a,b,c,d,e,s:y,g,h)
 add_scope id (1,b,c,d,e,y,g,h) = (1,b,c,d,e,(string_of_token id):y,g,h)
 
@@ -237,3 +239,28 @@ value_of_token (Lexer.Boolean _ c) = putStrLn(show c)
 
 boolean_of_expresison :: Token -> Bool
 boolean_of_expresison (Lexer.Boolean _ c) = c
+
+
+get_reserved_function :: Token -> Integer
+get_reserved_function x = 
+	if (string_of_token x == "print") then 1
+	else 
+		if(string_of_token x == "read") then 2
+		else 0
+
+{-
+grf2 :: Token -> Integer
+grf2 x = 
+	if (string_of_token x == "read") then 0
+	else 0
+-}
+
+execute_read :: [Token] -> String -> StateCode -> StateCode
+execute_read x v sc = 
+	update_read x v (get_variable_type (string_of_token (head x)) sc) sc
+--execute_read x v sc = update_read x v (get_variable_type (string_of_token (head x)) sc) sc
+	
+
+update_read :: [Token] -> String -> Token -> StateCode -> StateCode
+update_read x v (Lexer.Int _ _) sc = 
+	update_variable_value x [(Lexer.Int (AlexPn 0 0 0) (read v :: Int))] sc

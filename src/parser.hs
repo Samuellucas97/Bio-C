@@ -212,13 +212,25 @@ function_call = (do
         --liftIO(print c)
         d <- endBracketToken
         --updateState(enter_in_function a)
+        --liftIO(print c)
         k <- getState
         if (is_executing k == 1) then do
           if (is_reserved_function a) then do
+            if (get_reserved_function a == 1) then do
             --liftIO(print(value_of_token( head c)))
-            liftIO(value_of_token(head c))
-            updateState(remove_current_scope)
-            return ([a] ++ [b] ++ c ++ [d])
+              liftIO(value_of_token(head c))
+              updateState(remove_current_scope)
+              return ([a] ++ [b] ++ c ++ [d])
+            else do
+              if (get_reserved_function a == 2) then do
+
+                liftIO(print c)
+                --gl <- liftIO $ getLine
+                --updateState(execute_read c (show gl))
+                updateState(remove_current_scope)
+                return ([a] ++ [b] ++ c ++ [d])
+              else do
+                return ([a] ++ [b] ++ c ++ [d])
           else do
             c_state <- getInput
             --updateState(add_current_state c_state)

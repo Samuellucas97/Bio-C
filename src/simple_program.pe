@@ -7,6 +7,11 @@ int x(){
 
 int main(){
 
+	int tx = 0;
+	print(tx);
+	read(tx);
+	print(tx);
+
 	float l = 3.0;
 	float y = 2.0;
 	int c = 4;
@@ -35,5 +40,8 @@ int main(){
 
 	x();
 	//print(k);
+
+	
+
 	return 0;
 }
