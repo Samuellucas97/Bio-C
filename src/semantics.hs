@@ -98,7 +98,21 @@ get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,_,_,_):d,e
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Boolean t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Boolean (AlexPn 0 0 0) t2)]
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
-get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error "variable not found"
+get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error "variable k not found"
+
+
+pre_update_variable :: [Token] -> StateCode ->  StateCode
+pre_update_variable x s = puv x s []
+	
+
+
+puv :: [Token] -> StateCode -> [Variable] ->  StateCode
+puv [(Var p1 id)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) rem =
+	if(id == id1) then do
+		(a,b,c,((id1,tp,co,es,ref,cont):d ++ rem),e,f,g,h)
+	else
+		puv [(Var p1 id)] (a,b,c,d,e,f,g,h) ([(id1,tp,co,es,ref,cont)]++rem)
+puv _ (a,b,c,[],e,f,g,h) _ = error "variable not found"
 
 update_variable_value :: [Token] -> [Token] -> StateCode -> StateCode
 update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
@@ -107,9 +121,11 @@ update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,((id1,tp,co,es,
                             if(es == head f) then
                                 (a,b,c,([(id1,[get_type_of (Lexer.Int p value)],co,es,ref,cont)]++d),e,f,g,h)
                             else 
-                                (a,b,c,d,e,f,g,h)
+                            	error "variable a not found"
+                                --update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,d,e,f,g,h)
                                 --error("variable not in scope")
-                        else (a,b,c,d,e,f,g,h)
+                        else error "variable a not found"
+                        	--update_variable_value [(Var p1 id)] [(Lexer.Int p value)] (a,b,c,d,e,f,g,h)
                             --else error ("variable not in add_scope" ++ show p1)
 update_variable_value [(Var p1 id)] [(Lexer.Float p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
                             if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Float p value)],co,es,ref,cont)]++d),e,f,g,h)
@@ -117,7 +133,7 @@ update_variable_value [(Var p1 id)] [(Lexer.Float p value)] (a,b,c,((id1,tp,co,e
 update_variable_value [(Var p1 id)] [(Lexer.Boolean p value)] (a,b,c,((id1,tp,co,es,ref,cont):d),e,f,g,h) = 
                             if(id == id1) then (a,b,c,([(id1,[get_type_of (Lexer.Boolean p value)],co,es,ref,cont)]++d),e,f,g,h)
                             else (a,b,c,d,e,f,g,h) 
-update_variable_value _ _ (a,b,c,[],e,f,g,h) = error "variable not found"
+update_variable_value _ _ (a,b,c,[],e,f,g,h) = error "variable a not found"
 
 
 get_type_of :: Token -> TypeVal
@@ -262,5 +278,7 @@ execute_read x v sc =
 	
 
 update_read :: [Token] -> String -> Token -> StateCode -> StateCode
-update_read x v (Lexer.Int _ _) sc = 
-	update_variable_value x [(Lexer.Int (AlexPn 0 0 0) (read v :: Int))] sc
+update_read x v (Lexer.Int _ _) sc = update_variable_value x [(Lexer.Int (AlexPn 0 0 0) (read v::Int))] sc
+update_read x v (Lexer.Float _ _) sc = update_variable_value x [(Lexer.Float (AlexPn 0 0 0) (read v::Float))] sc
+update_read x v (Lexer.Boolean _ _) sc = update_variable_value x [(Lexer.Boolean (AlexPn 0 0 0) (read v::Bool))] sc
+update_read x v (Lexer.String _ _) sc = update_variable_value x [(Lexer.String (AlexPn 0 0 0) v)] sc

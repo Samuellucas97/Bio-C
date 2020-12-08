@@ -201,7 +201,26 @@ stmt = try (do
         return (a))
 
 function_call :: ParsecT [Token] StateCode IO([Token])
-function_call = (do
+function_call = try (do
+          a <- readToken
+          b <- beginBracketToken
+          c <- idToken
+          d <- endBracketToken
+
+          k <- getState
+
+          if (is_executing k == 1) then do
+            --liftIO(print c)
+            gl <- liftIO $ getLine
+            updateState(pre_update_variable [c])
+            updateState(execute_read [c] gl)
+            --kx <- getState
+            --liftIO(print k)
+            return ([a] ++ [b] ++ [c] ++ [d])
+          else do
+            return ([a] ++ [b] ++ [c] ++ [d])
+
+        ) <|> (do
         a <- idToken
         updateState(add_scope a)
         --s <- getState
@@ -218,19 +237,12 @@ function_call = (do
           if (is_reserved_function a) then do
             if (get_reserved_function a == 1) then do
             --liftIO(print(value_of_token( head c)))
+              --liftIO(print k)
               liftIO(value_of_token(head c))
               updateState(remove_current_scope)
               return ([a] ++ [b] ++ c ++ [d])
             else do
-              if (get_reserved_function a == 2) then do
-
-                liftIO(print c)
-                --gl <- liftIO $ getLine
-                --updateState(execute_read c (show gl))
-                updateState(remove_current_scope)
-                return ([a] ++ [b] ++ c ++ [d])
-              else do
-                return ([a] ++ [b] ++ c ++ [d])
+              return ([a] ++ [b] ++ c ++ [d])
           else do
             c_state <- getInput
             --updateState(add_current_state c_state)
@@ -284,7 +296,7 @@ varDeclaration = try (do
               if(c == []) then do
                 return (a ++ d ++[b] ++ c)
               else do
-
+                updateState(pre_update_variable [b])
                 updateState(update_variable_value [b] [(get_type c s)])
                 return (a ++ d ++[b] ++ c)
                 )
@@ -477,15 +489,18 @@ simpleExpr  = try (do
 
 varAssign :: ParsecT [Token] StateCode IO([Token])
 varAssign = try (do
+
           a <- extended_id
           --b <- squareBrackets
           c <- assignToken
           d <- expr
           s <- getState
+          --liftIO(print s)
           if(is_executing s == 1) then do
             if(not (compatible(get_type a s ) ( get_type d s))) then fail "type amismatch"
               else do
-                --liftIO(print d)
+                updateState(pre_update_variable [head a])
+                --liftIO(print s)
                 updateState(update_variable_value [head a] d)
                 return (a ++ [c] ++ d)
           else

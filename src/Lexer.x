@@ -24,6 +24,7 @@ tokens :-
   "//".*.                         ;
   "return"                        { \p s -> Return p }
   "const"                         { \p s -> Const p }
+  "read"                          { \p s -> Read p }
   "main"                          { \p s -> Main p }
   "def"                           { \p s -> Def p }
   "{"                             { \p s -> BeginScope p }
@@ -84,6 +85,7 @@ data Token =
   Return             AlexPosn |
   Const              AlexPosn |
   Def                AlexPosn |
+  Read               AlexPosn | 
   Main               AlexPosn | 
   BeginScope         AlexPosn |
   EndScope           AlexPosn |

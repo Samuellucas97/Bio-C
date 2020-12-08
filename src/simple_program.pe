@@ -7,9 +7,36 @@ int x(){
 
 int main(){
 
+	int ix = 0;
+	int iy = 0;
+	
+
+	int inp = 0;
+
+	read(inp);
+	while(inp >= 0){
+		
+		
+		if (inp > 10){
+			ix = ix + 1;
+		} else {
+			iy= iy + 1;
+		}
+		read(inp);
+
+	}
+
+	print("I1");
+	print(ix);
+
+	print("I2");
+	print(iy);
+
+
 	int tx = 0;
 	print(tx);
 	read(tx);
+	print("valor de tx");
 	print(tx);
 
 	float l = 3.0;
@@ -37,6 +64,8 @@ int main(){
 	} else {
 		print("false2");
 	}
+
+	print(varx);
 
 	x();
 	//print(k);

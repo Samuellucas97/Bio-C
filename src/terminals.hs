@@ -10,6 +10,11 @@ import System.IO.Unsafe
 
 -- parsers para os tokens
 
+readToken :: ParsecT [Token] st IO(Token)
+readToken = tokenPrim show update_pos get_token where
+  get_token (Read p)    = Just (Read p)
+  get_token _       = Nothing
+
 mainToken :: ParsecT [Token] st IO(Token)
 mainToken = tokenPrim show update_pos get_token where
   get_token (Main p)    = Just (Main p)
