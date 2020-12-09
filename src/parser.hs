@@ -400,7 +400,7 @@ bin_operation  =
 
 eval_remaining_bin :: [Token] -> ParsecT [Token] StateCode IO([Token])
 eval_remaining_bin n1 = try (do
-                      op <- multToken <|> divToken
+                      op <- multToken <|> divToken <|> powToken
                       n2 <- literal
                       result <- eval_remaining_bin (eval_bin n1 [op] n2)
                       --liftIO(print result)
@@ -439,6 +439,7 @@ eval_bin [(Lexer.Int p x)] [(GreaterOrEqual p1)] [(Lexer.Int _ y)] = [Lexer.Bool
 eval_bin [(Lexer.Int p x)] [(LessOrEqual p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x <= y)]
 eval_bin [(Lexer.Int p x)] [(Greater p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x > y)] 
 eval_bin [(Lexer.Int p x)] [(Less p1)] [(Lexer.Int _ y)] = [Lexer.Boolean p (x < y)]
+eval_bin [(Lexer.Int p x)] [(Pow p1)] [(Lexer.Int _ y)] = [Lexer.Int p (x ^ y)]
 eval_bin [(Lexer.Float p x)] [(Plus p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x + y)]
 eval_bin [(Lexer.Float p x)] [(Minus p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x - y)]
 eval_bin [(Lexer.Float p x)] [(Mult p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x * y)]
@@ -451,6 +452,8 @@ eval_bin [(Lexer.Float p x)] [(GreaterOrEqual p1)] [(Lexer.Float _ y)] = [Lexer.
 eval_bin [(Lexer.Float p x)] [(LessOrEqual p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x <= y)]
 eval_bin [(Lexer.Float p x)] [(Greater p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x > y)] 
 eval_bin [(Lexer.Float p x)] [(Less p1)] [(Lexer.Float _ y)] = [Lexer.Boolean p (x < y)]
+eval_bin [(Lexer.Float p x)] [(Pow p1)] [(Lexer.Int _ y)] = [Lexer.Float p (x ^ y)]
+eval_bin [(Lexer.Float p x)] [(Pow p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x ** y)]
 eval_bin [(Lexer.Boolean p x)] [(Different p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x /= y)]
 eval_bin [(Lexer.Boolean p x)] [(Equal p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x == y)]
 
