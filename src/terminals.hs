@@ -10,6 +10,38 @@ import System.IO.Unsafe
 
 -- parsers para os tokens
 
+reverseTranscriptionToken :: ParsecT [Token] st IO(Token)
+reverseTranscriptionToken = tokenPrim show update_pos get_token where
+  get_token (ReverseTranscription p)    = Just (ReverseTranscription p)
+  get_token _       = Nothing
+
+translateToken :: ParsecT [Token] st IO(Token)
+translateToken = tokenPrim show update_pos get_token where
+  get_token (Translate p)    = Just (Translate p)
+  get_token _       = Nothing
+
+transcriptionToken :: ParsecT [Token] st IO(Token)
+transcriptionToken = tokenPrim show update_pos get_token where
+  get_token (Transcription p)    = Just (Transcription p)
+  get_token _       = Nothing
+
+reverseToken :: ParsecT [Token] st IO(Token)
+reverseToken = tokenPrim show update_pos get_token where
+  get_token (Reverse p)    = Just (Reverse p)
+  get_token _       = Nothing
+
+
+complementToken :: ParsecT [Token] st IO(Token)
+complementToken = tokenPrim show update_pos get_token where
+  get_token (Complement p)    = Just (Complement p)
+  get_token _       = Nothing
+
+
+complement_reverseToken :: ParsecT [Token] st IO(Token)
+complement_reverseToken = tokenPrim show update_pos get_token where
+  get_token (ReverseComplement p)    = Just (ReverseComplement p)
+  get_token _       = Nothing
+
 readToken :: ParsecT [Token] st IO(Token)
 readToken = tokenPrim show update_pos get_token where
   get_token (Read p)    = Just (Read p)

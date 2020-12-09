@@ -22,6 +22,12 @@ tokens :-
 
   $white+                         ;
   "//".*.                         ;
+  "reverse_transcription"         { \p s -> ReverseTranscription p }
+  "translate"                     { \p s -> Translate p }
+  "transcription"                 { \p s -> Transcription p }
+  "reverse"                       { \p s -> Reverse p }
+  "complement"                    { \p s -> Complement p }
+  "reverse_complement"            { \p s -> ReverseComplement p }
   "return"                        { \p s -> Return p }
   "const"                         { \p s -> Const p }
   "read"                          { \p s -> Read p }
@@ -82,6 +88,12 @@ tokens :-
 
 -- The token type:
 data Token =
+  ReverseTranscription AlexPosn |
+  Translate          AlexPosn |
+  Transcription      AlexPosn |
+  Reverse            AlexPosn |
+  Complement         AlexPosn |
+  ReverseComplement  AlexPosn |
   Return             AlexPosn |
   Const              AlexPosn |
   Def                AlexPosn |

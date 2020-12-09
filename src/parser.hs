@@ -3,6 +3,7 @@ module Main (main) where
 
 import Data.Functor.Identity
 import Lexer
+import Genetics
 import Text.Parsec
 import Terminals
 import Semantics
@@ -283,7 +284,6 @@ varDeclaration = try (do
           d <- square_brackets
           b <- idToken
           c <- optAssign
-          s <- getState
           --liftIO(print c)
           --if(is_executing s == 0) then do
           --updateState(register_variable (head a) b)
@@ -291,6 +291,7 @@ varDeclaration = try (do
           --liftIO(print s)
           --if(is_executing s == 1) then do
           updateState(register_variable (head a) b)
+          s <- getState
           if(c /= [] && not (compatible(get_type a s ) ( get_type c s))) then fail "type mismatch"
             else do         --d <- semiColonToken 
               if(c == []) then do
@@ -318,6 +319,12 @@ get_type [_,(Lexer.String a b)] _ = (Lexer.String a b)
 get_type [(Lexer.String a b)] _ = (Lexer.String a b)
 get_type (_:((Lexer.Var a b):t)) s = (get_function_type b s)
 get_type [(Lexer.Var a b)] s = (get_variable_type b s)
+get_type (_:((Lexer.Rna a b):t)) s = (Lexer.Rna a b)
+get_type [(Lexer.Rna a b)] s = (Lexer.Rna a b)
+get_type (_:((Lexer.Dna a b):t)) s = (Lexer.Dna a b)
+get_type [(Lexer.Dna a b)] s = (Lexer.Dna a b)
+get_type (_:((Lexer.Protein a b):t)) s = (Lexer.Protein a b)
+get_type [(Lexer.Protein a b)] s = (Lexer.Protein a b)
 get_type _ _ = error "type not found"
 
 compatible :: Token -> Token -> Bool
@@ -406,7 +413,7 @@ eval_remaining_bin n1 = try (do
                       --liftIO(print result)
                       return (result) )
                     <|>(do
-                      op <- multToken <|> divToken
+                      op <- multToken <|> divToken <|> powToken
                       n2 <- idToken
                       s <- getState
                       result <- eval_remaining_bin (eval_bin n1 [op] (get_variable_value [n2] s))
@@ -420,11 +427,11 @@ eval_remaining_bin n1 = try (do
                       --liftIO(print result)
                       return (result) )
                     <|>(do
-                                          op <- bin_operator
-                                          n2 <- expr
-                                          result <- eval_remaining_bin (eval_bin n1 op n2)
-                                          --liftIO(print result)
-                                          return (result) )
+                        op <- bin_operator
+                        n2 <- expr
+                        result <- eval_remaining_bin (eval_bin n1 op n2)
+                        --liftIO(print result)
+                        return (result) )
                     <|> (return (n1))       
 
 eval_bin :: [Token] -> [Token] -> [Token] -> [Token]
@@ -456,6 +463,18 @@ eval_bin [(Lexer.Float p x)] [(Pow p1)] [(Lexer.Int _ y)] = [Lexer.Float p (x ^ 
 eval_bin [(Lexer.Float p x)] [(Pow p1)] [(Lexer.Float _ y)] = [Lexer.Float p (x ** y)]
 eval_bin [(Lexer.Boolean p x)] [(Different p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x /= y)]
 eval_bin [(Lexer.Boolean p x)] [(Equal p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.Boolean p x)] [(GreaterOrEqual p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x >= y)] 
+eval_bin [(Lexer.Boolean p x)] [(LessOrEqual p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x <= y)]
+eval_bin [(Lexer.Boolean p x)] [(Greater p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x > y)] 
+eval_bin [(Lexer.Boolean p x)] [(Less p1)] [(Lexer.Boolean _ y)] = [Lexer.Boolean p (x < y)]
+eval_bin [(Lexer.Char p x)] [(Different p1)] [(Lexer.Char _ y)] = [Lexer.Boolean p (x /= y)]
+eval_bin [(Lexer.Char p x)] [(Equal p1)] [(Lexer.Char _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.String p x)] [(Different p1)] [(Lexer.String _ y)] = [Lexer.Boolean p (x /= y)]
+eval_bin [(Lexer.String p x)] [(Equal p1)] [(Lexer.String _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.String p x)] [(Plus p1)] [(Lexer.String _ y)] = [Lexer.String p (x ++ y)]
+eval_bin [(Lexer.Dna p x)] [(Equal p1)] [(Lexer.Dna _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.Rna p x)] [(Equal p1)] [(Lexer.Rna _ y)] = [Lexer.Boolean p (x == y)]
+eval_bin [(Lexer.Protein p x)] [(Equal p1)] [(Lexer.Protein _ y)] = [Lexer.Boolean p (x == y)]
 
 
 un_operation :: ParsecT [Token] StateCode IO([Token])
@@ -469,8 +488,19 @@ un_operation  =
 eval_un :: Token -> [Token] -> Token
 eval_un (Minus p1) [(Lexer.Int p y)] = (Lexer.Int p (-y))
 eval_un (OpNot p1) [(Lexer.Boolean p y)] = (Lexer.Boolean p (not y))
-eval_un (Minus p1) [(Lexer.Boolean p y)] = error ("Operador inválido para boolean")
-eval_un (OpNot p1) [(Lexer.Int p y)] = error ("Operador inválido para inteiros")
+eval_un (Reverse p1) [(Lexer.String p y)] = (Lexer.String p (reverse y))
+eval_un (Reverse p1) [(Lexer.Dna p y)] = (Lexer.Dna p (([head(y)] ++ [head(tail(y))]) ++ (reverse (tail(tail(y))))   ))
+eval_un (Reverse p1) [(Lexer.Rna p y)] = (Lexer.Rna p (([head(y)] ++ [head(tail(y))]) ++ (reverse (tail(tail(y))))   ))
+eval_un (Reverse p1) [(Lexer.Protein p y)] = (Lexer.Protein p (([head(y)] ++ [head(tail(y))]) ++ (reverse (tail(tail(y))))   ))
+eval_un (Complement p1) [(Lexer.Dna p y)] = (Lexer.Dna p (([head(y)] ++ [head(tail(y))]) ++ (complementoDNA (tail(tail(y))))   ))
+eval_un (ReverseComplement p1) [(Lexer.Dna p y)] = (Lexer.Dna p (([head(y)] ++ [head(tail(y))]) ++ (complementoReversoDNA (tail(tail(y))))   ))
+eval_un (Transcription p1) [(Lexer.Dna p y)] = (Lexer.Rna p (("r:") ++ (transcricao (tail(tail(y))))   ))
+eval_un (Complement p1) [(Lexer.Rna p y)] = (Lexer.Rna p (([head(y)] ++ [head(tail(y))]) ++ (complementoRNA (tail(tail(y))))   ))
+eval_un (ReverseComplement p1) [(Lexer.Rna p y)] = (Lexer.Rna p (([head(y)] ++ [head(tail(y))]) ++ (complementoReversoRNA (tail(tail(y))))   ))
+eval_un (ReverseTranscription p1) [(Lexer.Rna p y)] = (Lexer.Dna p ("d:" ++ (reverseTranscricao (tail(tail(y))))   ))
+eval_un (Minus p1) [(Lexer.Boolean p y)] = error ("Operador inválido para boolean " ++ (show p1))
+eval_un (OpNot p1) [(Lexer.Int p y)] = error ("Operador inválido para inteiros " ++ (show p1))
+eval_un a b = error (show a)
 
 eval_remaining_un :: Token -> ParsecT [Token] StateCode IO(Token)
 eval_remaining_un n1 = try (do
@@ -515,7 +545,7 @@ varAssign = try (do
 
 un_operator :: ParsecT [Token] StateCode IO(Token)
 un_operator  = (do 
-        a <- notToken <|> minusToken
+        a <- notToken <|> minusToken <|> reverseToken <|> complementToken <|> complement_reverseToken <|> transcriptionToken <|> translateToken <|> reverseTranscriptionToken
         return (a))
 
 bin_operator :: ParsecT [Token] StateCode IO([Token])
