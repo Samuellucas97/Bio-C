@@ -95,7 +95,84 @@ get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Int t2):_,_,s,_,_):d,e,f
                 get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
                 --error "variable not in scope"
     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
-get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Float (AlexPn 0 0 0) t2)]
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Float (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Float (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Boolean t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Boolean (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Boolean (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.String t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.String (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.String (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Char t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Char (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Char (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Protein t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Protein (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Protein (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Rna t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Rna (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Rna (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Dna t2):_,_,s,_,_):d,e,f,g,h) = 
+    if(id == id1) then 
+        if(s == head f) then do
+            [(Lexer.Dna (AlexPn 0 0 0) t2)]
+        else 
+            if(head f == "print" && s == head(tail f)) then do
+                [(Lexer.Dna (AlexPn 0 0 0) t2)]
+            else
+                get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+                --error "variable not in scope"
+    else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
+{-get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Float t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Float (AlexPn 0 0 0) t2)]
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Boolean t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.Boolean (AlexPn 0 0 0) t2)]
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
@@ -108,7 +185,7 @@ get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.Protein t2):_,_,_,_,_):d
 get_variable_value [(Var p1 id)] (a,b,c,(id1,(Semantics.String t2):_,_,_,_,_):d,e,f,g,h) = if(id == id1) then [(Lexer.String (AlexPn 0 0 0) t2)]
                     else get_variable_value [(Var p1 id)] (a,b,c,d,e,f,g,h)
 get_variable_value [(Var p1 id)] (a,b,c,[],e,f,g,h) = error ("variable " ++id++ " not found " ++ (show p1))
-
+-}
 
 pre_update_variable :: [Token] -> StateCode ->  StateCode
 pre_update_variable x s = puv x s []
