@@ -1,5 +1,8 @@
 int main(){
-    rna d = transcription "d:ACTGGGGGGG";
-    
+    dna d = "d:TTTTTATTGTTCAAAAGGGGGCGCGC";
     print(d);
+    rna r = transcription d;
+    print(r);
+    protein p = translate r;    
+    print(p);
 }
