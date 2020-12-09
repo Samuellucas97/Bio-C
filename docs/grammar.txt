@@ -18,9 +18,6 @@
 
 
 
-
-
-
 <functions> ::= [ <function> ]
 <function> ::= <extended_type> ID "(" <params> ")"  <block>
 <params> ::= [ <param> ]
@@ -29,19 +26,10 @@
 <sb_param_values> ::= <sb_param_value> | <sb_param_value> "," <sb_param_values>
 <sb_param_value> ::= "" | <expr>
 
-
-
-
 <main> ::= "def" "main" "(" <main_args> ")" ":" INT_TYPE <block>
 <main_args> ::= "" | <argc> "," <argv>
 <argc> ::= INT_TYPE ID
 <argv> :: STR_LIST_TYPE ID
-
-
-------------
-OK ATÉ AQUI (sem argc e argv do main)
-------------
-
 
 <block> ::= "{" <statements> "}"
 <statements> ::= [ <statement> ]
@@ -62,7 +50,6 @@ OK ATÉ AQUI (sem argc e argv do main)
 <square_brackets> ::= "[" <square_bracket_values> "]" | ""
 <square_brackets_values> ::= <expr> | <expr> "," <square_brackets_values>
 
-*exemplos: int[2] arr1; int[3,9+2] arr2; float[getSize(y)] arr3;
 
 <array_def> ::= "[" <elements> "]"
 <elements> ::= <element> | <element> "," <elements>
@@ -75,25 +62,13 @@ OK ATÉ AQUI (sem argc e argv do main)
 <attribute_access> ::= "." <extended_id> | ""
 
 
-*exemplo: node[2,3].left.left[3,3].a ;
-
-
-
 <condition> ::= "if" "(" <expr> ")" <block> <opt_condition>
 <opt_condition> ::= "else" {<condition> | <block>} | ""
 
-------------
-                  ||
-FIZEMOS ISSO TBM  \/
-------------
 
 <loop> ::= "while" "(" <expr> ")" <block>
 
-------------
 
-FIZEMOS ISSO TBM  /\
-                  ||
-------------
 <function_call> ::= ID "(" <opt_args> ")"
 <opt_args> ::= "" | <args>
 <args> ::= <expr> | <expr> "," <args>
