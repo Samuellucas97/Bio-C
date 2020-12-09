@@ -1,0 +1,5 @@
+int main(){
+    rna d = transcription "d:ACTGGGGGGG";
+    
+    print(d);
+}
