@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-unused-binds -fno-warn-missing-signatures #-}
 {-# LANGUAGE CPP #-}
-{-# LINE 1 "Lexer.x" #-}
+{-# LINE 1 "lexer.x" #-}
 
 --module Main (main, Token(..), AlexPosn(..), alexScanTokens) where
 module Lexer where
@@ -35291,7 +35291,7 @@ alex_actions = array (0 :: Int, 173)
   , (0,alex_action_60)
   ]
 
-{-# LINE 85 "Lexer.x" #-}
+{-# LINE 85 "lexer.x" #-}
 
 -- Each right-hand side has type :: AlexPosn -> String -> Token
 -- Some action helpers:
